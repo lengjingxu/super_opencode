@@ -120,8 +120,6 @@ npm run build:mac
 
 ## 发布新版本
 
-> **重要**：源代码不公开，GitHub 仓库只存放 README 和 Releases 安装包。
-
 ### 发布流程
 
 ```bash
@@ -131,25 +129,11 @@ npm run build:mac
 GH_TOKEN=$(gh auth token) npm run publish:mac
 ```
 
-### 发布产物说明
-
-发布后 GitHub Releases 会包含以下文件：
-
-| 文件 | 用途 |
-|------|------|
-| `latest-mac.yml` | **关键** - 客户端热更新检测文件 |
-| `Super-OpenCode-x.x.x.dmg` | macOS Intel 安装包 |
-| `Super-OpenCode-x.x.x-arm64.dmg` | macOS Apple Silicon 安装包 |
-| `Super-OpenCode-x.x.x-mac.zip` | macOS Intel 更新包（热更新下载） |
-| `Super-OpenCode-x.x.x-arm64-mac.zip` | macOS Apple Silicon 更新包 |
-| `*.blockmap` | 增量更新文件，减少下载量 |
-
 ### 注意事项
 
-1. **不要推送源代码** - 仓库只保留 README.md，源代码保存在本地
-2. **确保 latest-mac.yml 上传成功** - 这是热更新的关键文件
-3. **版本号必须递增** - electron-updater 通过版本号判断是否有新版本
-4. **发布后验证** - 运行 `gh release view vX.X.X --repo lengjingxu/oh-my-opencode-releases` 确认文件完整
+1. **确保 latest-mac.yml 上传成功** - 这是热更新的关键文件
+2. **版本号必须递增** - electron-updater 通过版本号判断是否有新版本
+3. **发布后验证** - 运行 `gh release view vX.X.X --repo lengjingxu/oh-my-opencode-releases` 确认文件完整
 
 ## 致谢
 

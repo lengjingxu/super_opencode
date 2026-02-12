@@ -1,0 +1,7 @@
+{
+  "name": "angular",
+  "display_name": "Angular 17+",
+  "description": "Angular 17+ Standalone Components + Angular Material",
+  "category": "frontend",
+  "prompt_append": "## 前端技术栈要求（必须遵守）\n\n### 框架\n- Angular 17+\n- 使用 Standalone Components（不是 NgModule）\n- 使用 Signals 进行状态管理\n- 使用 inject() 函数进行依赖注入\n\n### UI 组件\n- 使用 Angular Material\n- 样式使用 SCSS\n- 遵循 Material Design 规范\n\n### 路由\n- 使用 Angular Router\n- 懒加载模块\n- 路由守卫保护页面\n\n### 代码规范\n- 使用 TypeScript 严格模式\n- 遵循 Angular 官方风格指南\n- 文件命名：feature.type.ts\n\n### 语言\n- 所有注释使用中文\n- 界面文本使用中文"
+}

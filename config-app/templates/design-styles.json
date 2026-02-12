@@ -1,0 +1,110 @@
+{
+  "styles": [
+    {
+      "id": "glassmorphism",
+      "name": "玻璃拟态",
+      "desc": "毛玻璃效果，现代 SaaS"
+    },
+    {
+      "id": "neumorphism",
+      "name": "新拟态",
+      "desc": "柔和阴影，健康/冥想应用"
+    },
+    {
+      "id": "minimalism",
+      "name": "极简主义",
+      "desc": "简洁干净，企业应用"
+    },
+    {
+      "id": "brutalism",
+      "name": "野兽派",
+      "desc": "大胆粗犷，艺术项目"
+    },
+    {
+      "id": "bento-grid",
+      "name": "便当盒布局",
+      "desc": "网格卡片，仪表盘"
+    },
+    {
+      "id": "dark-mode",
+      "name": "深色模式",
+      "desc": "OLED 友好，开发工具"
+    },
+    {
+      "id": "ai-native",
+      "name": "AI 原生",
+      "desc": "聊天界面，智能助手"
+    },
+    {
+      "id": "soft-ui",
+      "name": "柔和 UI",
+      "desc": "柔和阴影，现代企业"
+    },
+    {
+      "id": "neubrutalism",
+      "name": "新野兽派",
+      "desc": "Gen Z 风格，年轻品牌"
+    },
+    {
+      "id": "liquid-glass",
+      "name": "液态玻璃",
+      "desc": "苹果风格，高端产品"
+    }
+  ],
+  "color_palettes": [
+    {
+      "id": "tech-blue",
+      "name": "科技蓝",
+      "colors": {
+        "primary": "#3B82F6",
+        "secondary": "#1E40AF",
+        "accent": "#60A5FA"
+      }
+    },
+    {
+      "id": "nature-green",
+      "name": "自然绿",
+      "colors": {
+        "primary": "#10B981",
+        "secondary": "#059669",
+        "accent": "#34D399"
+      }
+    },
+    {
+      "id": "luxury-gold",
+      "name": "奢华金",
+      "colors": {
+        "primary": "#D4AF37",
+        "secondary": "#B8860B",
+        "accent": "#FFD700"
+      }
+    },
+    {
+      "id": "modern-purple",
+      "name": "现代紫",
+      "colors": {
+        "primary": "#8B5CF6",
+        "secondary": "#7C3AED",
+        "accent": "#A78BFA"
+      }
+    },
+    {
+      "id": "warm-coral",
+      "name": "温暖珊瑚",
+      "colors": {
+        "primary": "#F97316",
+        "secondary": "#EA580C",
+        "accent": "#FB923C"
+      }
+    },
+    {
+      "id": "dark-elegant",
+      "name": "深色优雅",
+      "colors": {
+        "primary": "#6366F1",
+        "secondary": "#4F46E5",
+        "accent": "#818CF8"
+      }
+    }
+  ]
+}

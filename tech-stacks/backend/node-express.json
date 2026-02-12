@@ -1,0 +1,7 @@
+{
+  "name": "node-express",
+  "display_name": "Node.js + Express",
+  "description": "Express.js + Prisma + TypeScript",
+  "category": "backend",
+  "prompt_append": "## 后端技术栈要求（必须遵守）\n\n### 框架\n- Express.js\n- TypeScript 严格模式\n- Node.js 18+\n\n### 数据库\n- ORM：Prisma\n- 数据库：MySQL 或 PostgreSQL\n- 迁移：Prisma Migrate\n\n### 项目结构\n```\nsrc/\n  index.ts            # 应用入口\n  app.ts              # Express 配置\n  config/             # 配置\n  routes/             # 路由\n  controllers/        # 控制器\n  services/           # 业务逻辑\n  middlewares/        # 中间件\n  utils/              # 工具函数\n  types/              # 类型定义\nprisma/\n  schema.prisma       # Prisma Schema\n```\n\n### API 规范\n- RESTful 设计\n- 统一响应格式：{code, message, data}\n- 错误处理：统一错误中间件\n\n### 日志\n- 使用 winston\n- 格式：[时间] [级别] [模块] 消息\n- 关键操作必须记录日志\n\n### 语言\n- 所有注释使用中文"
+}

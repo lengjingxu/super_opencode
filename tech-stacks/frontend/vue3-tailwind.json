@@ -1,0 +1,7 @@
+{
+  "name": "vue3-tailwind",
+  "display_name": "Vue 3 + Tailwind + DaisyUI",
+  "description": "Vue 3 CDN 模式 + Tailwind CSS + DaisyUI 组件库",
+  "category": "frontend",
+  "prompt_append": "## 前端技术栈要求（必须遵守）\n\n### 框架\n- 使用 Vue.js 3 (CDN模式)\n  ```html\n  <script src=\"https://unpkg.com/vue@3/dist/vue.global.js\"></script>\n  ```\n- 禁止使用需要编译的构建工具（如 Vite、Webpack）\n- 使用 Options API 或 Composition API 均可\n\n### 样式\n- 使用 Tailwind CSS + DaisyUI (CDN模式)\n  ```html\n  <link href=\"https://cdn.jsdelivr.net/npm/daisyui@4/dist/full.min.css\" rel=\"stylesheet\">\n  <script src=\"https://cdn.tailwindcss.com\"></script>\n  ```\n\n### 设计风格：苹果液态玻璃风格\n- 毛玻璃效果：`backdrop-blur-xl`, `bg-white/30`, `bg-black/20`\n- 柔和阴影：`shadow-xl`, `shadow-2xl`\n- 大圆角：`rounded-2xl`, `rounded-3xl`\n- 微妙边框：`border border-white/20`\n- 渐变背景：`bg-gradient-to-br`\n- 动画过渡：`transition-all duration-300`\n\n### 语言\n- 所有注释使用中文\n- 界面文本使用中文"
+}

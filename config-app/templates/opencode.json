@@ -1,0 +1,63 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  
+  "provider": {
+    "unified-proxy": {
+      "npm": "@ai-sdk/openai-compatible",
+      "name": "统一代理服务",
+      "options": {
+        "baseURL": ""
+      },
+      "models": {
+        "claude-opus-4-5": {
+          "name": "Claude Opus 4.5",
+          "maxTokens": 32000
+        },
+        "claude-sonnet-4-5": {
+          "name": "Claude Sonnet 4.5",
+          "maxTokens": 16000
+        },
+        "claude-haiku-4-5": {
+          "name": "Claude Haiku 4.5",
+          "maxTokens": 8000
+        },
+        "gpt-4.1": {
+          "name": "GPT-4.1",
+          "maxTokens": 32000
+        },
+        "gpt-4.1-mini": {
+          "name": "GPT-4.1 Mini",
+          "maxTokens": 16000
+        },
+        "gemini-2.5-pro": {
+          "name": "Gemini 2.5 Pro",
+          "maxTokens": 32000
+        },
+        "gemini-2.5-flash": {
+          "name": "Gemini 2.5 Flash",
+          "maxTokens": 16000
+        }
+      }
+    }
+  },
+  
+  "plugins": {
+    "opencode-notificator": {
+      "enabled": true,
+      "sound": true,
+      "events": ["task_complete", "permission_request", "error"]
+    },
+    "opencode-supermemory": {
+      "enabled": true
+    },
+    "opencode-dynamic-context-pruning": {
+      "enabled": true
+    }
+  },
+  
+  "hooks": {
+    "session_complete": "~/.config/opencode/hooks/notify.sh complete",
+    "permission_request": "~/.config/opencode/hooks/notify.sh permission",
+    "error": "~/.config/opencode/hooks/notify.sh error"
+  }
+}

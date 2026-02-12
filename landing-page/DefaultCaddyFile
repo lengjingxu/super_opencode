@@ -1,0 +1,28 @@
+:8000 {
+    root * .
+    # Block access to sensitive paths
+    @unsafePath {
+      path /.git/* /node_modules/* /vendor/* /.venv/*
+    }
+    respond @unsafePath 404
+    # Configure cache policies for different file types
+    @staticAssets {
+      path *.css *.js *.png *.jpg *.jpeg *.gif *.svg *.ico *.webp
+    }
+    @htmlFiles {
+      path *.html
+    }
+    # Long cache for static assets (1 year), browser updates when filename changes
+    header @staticAssets Cache-Control "public, max-age=31536000, immutable"
+    # No cache for HTML
+    header @htmlFiles Cache-Control "no-cache, no-store, must-revalidate"
+    header @htmlFiles Pragma "no-cache"
+    header @htmlFiles Expires "0"
+    # Default cache header for unmatched files
+    header Cache-Control "public, max-age=3600"
+    file_server
+    try_files {path} {path}.html {path}/index.html 404.html index.html
+    log {
+      output stderr
+    }
+}

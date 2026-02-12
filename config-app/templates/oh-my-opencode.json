@@ -1,0 +1,76 @@
+{
+  "$schema": "https://raw.githubusercontent.com/code-yeongyu/oh-my-opencode/master/assets/oh-my-opencode.schema.json",
+  
+  "agents": {
+    "sisyphus": {
+      "model": "unified-proxy/claude-opus-4-5",
+      "prompt_append": "使用中文回答。"
+    },
+    "oracle": {
+      "model": "unified-proxy/gpt-4.1",
+      "prompt_append": "使用中文回答。你是架构审查和调试专家。"
+    },
+    "prometheus": {
+      "model": "unified-proxy/claude-opus-4-5",
+      "prompt_append": "使用中文回答。你是任务规划专家。"
+    },
+    "explore": {
+      "model": "unified-proxy/claude-haiku-4-5",
+      "prompt_append": "使用中文搜索和回答。"
+    },
+    "librarian": {
+      "model": "unified-proxy/gemini-2.5-pro",
+      "prompt_append": "使用中文回答。你是文档和开源项目查找专家。"
+    },
+    "multimodal-looker": {
+      "model": "unified-proxy/gemini-2.5-flash",
+      "prompt_append": "使用中文描述图片内容。"
+    },
+    "metis": {
+      "model": "unified-proxy/claude-opus-4-5",
+      "prompt_append": "使用中文回答。你是需求分析专家，善于发现隐藏意图。"
+    },
+    "momus": {
+      "model": "unified-proxy/gpt-4.1",
+      "prompt_append": "使用中文回答。你是方案审查专家，严格评审。"
+    }
+  },
+  
+  "categories": {
+    "visual-engineering": {
+      "model": "unified-proxy/gemini-2.5-pro",
+      "prompt_append": "## UI/UX 设计规范\n\n### 可用 Skills\n- /ui-ux-pro-max - 设计系统生成，执行 UI 任务前必须先加载\n- /image-generator - 需要图片素材时使用\n\n### 设计原则\n- 对比度至少 4.5:1\n- 触摸目标至少 44x44px\n- 所有可点击元素必须有 cursor-pointer\n- 所有交互元素必须有 hover/focus 状态\n- 不使用 emoji 作为图标，使用 SVG 或图标库\n- 避免 AI 典型配色（紫粉渐变）\n\n### 技术栈要求\n使用中文回答和注释。\n\n### 质量要求\n- 代码完成后必须通过测试\n- 关键操作必须有日志\n- 所有注释使用中文\n- 交付前检查 Pre-delivery Checklist"
+    },
+    "ultrabrain": {
+      "model": "unified-proxy/gpt-4.1",
+      "variant": "xhigh",
+      "prompt_append": "## 复杂逻辑任务\n\n### 可用 Skills\n- /sql-query - 需要查询数据库时使用\n- /data-storytelling - 需要数据分析和可视化时使用\n\n### 要求\n使用中文回答。这是复杂逻辑任务，需要深度推理。"
+    },
+    "deep": {
+      "model": "unified-proxy/gpt-4.1",
+      "prompt_append": "## 深度研究任务\n\n### 可用 Skills\n- /sql-query - 需要查询数据库时使用\n- /data-storytelling - 需要数据分析和可视化时使用\n\n### 要求\n使用中文回答。这是深度问题，需要彻底研究。"
+    },
+    "artistry": {
+      "model": "unified-proxy/gemini-2.5-pro",
+      "variant": "max",
+      "prompt_append": "## 创意设计任务\n\n### 可用 Skills\n- /ui-ux-pro-max - 设计系统生成\n- /image-generator - 生成创意图片素材\n\n### 要求\n使用中文回答。这是创意设计任务，鼓励非常规方案。"
+    },
+    "quick": {
+      "model": "unified-proxy/claude-haiku-4-5",
+      "prompt_append": "## 快速任务\n\n### 可用 Skills\n- /deploy-fc - 快速部署到阿里云函数计算\n- /deploy-docker - Docker 容器化部署\n- /deploy-ecs - ECS 服务器部署\n\n### 要求\n使用中文回答。这是简单任务，快速完成，最小改动。"
+    },
+    "unspecified-low": {
+      "model": "unified-proxy/claude-sonnet-4-5",
+      "prompt_append": "## 通用任务\n\n### 可用 Skills\n- /sql-query - 数据库查询\n- /deploy-fc - 云函数部署\n- /test-runner - 运行测试\n- /log-standard - 日志规范\n\n### 要求\n使用中文回答。"
+    },
+    "unspecified-high": {
+      "model": "unified-proxy/o3",
+      "variant": "max",
+      "prompt_append": "## 高复杂度任务\n\n### 思维模式\n这是高复杂度任务，请使用思维链(Chain of Thought)进行推理：\n1. 先分析问题的各个方面\n2. 逐步推导解决方案\n3. 验证每一步的逻辑正确性\n4. 最后给出完整答案\n\n### 可用 Skills\n- /sql-query - 数据库查询\n- /data-storytelling - 数据分析可视化\n- /deploy-fc - 云函数部署\n- /deploy-docker - Docker 部署\n- /test-runner - 运行测试\n\n### 要求\n使用中文回答。"
+    },
+    "writing": {
+      "model": "unified-proxy/gemini-2.5-flash",
+      "prompt_append": "## 文档撰写任务\n\n### 可用 Skills\n- /log-standard - 日志规范参考\n- /data-storytelling - 数据报告生成\n\n### 要求\n使用简体中文撰写所有文档。"
+    }
+  }
+}

@@ -1,0 +1,1347 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Super OpenCode - 开箱即用的多 Agent AI 编程方案</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&family=Space+Grotesk:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@4.7.2/dist/full.min.css" rel="stylesheet" type="text/css" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"Noto Sans SC"', 'sans-serif'],
+                        display: ['"Space Grotesk"', 'sans-serif'],
+                    },
+                    colors: {
+                        glass: {
+                            100: 'rgba(255, 255, 255, 0.05)',
+                            200: 'rgba(255, 255, 255, 0.1)',
+                            300: 'rgba(255, 255, 255, 0.15)',
+                        },
+                        brand: {
+                            primary: '#8b5cf6', 
+                            secondary: '#3b82f6',
+                            accent: '#ec4899',
+                        }
+                    },
+                    animation: {
+                        'float': 'float 6s ease-in-out infinite',
+                        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-20px)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #0f172a;
+            background-image: 
+                radial-gradient(circle at 15% 50%, rgba(139, 92, 246, 0.15) 0%, transparent 25%),
+                radial-gradient(circle at 85% 30%, rgba(59, 130, 246, 0.15) 0%, transparent 25%);
+            color: #f8fafc;
+            overflow-x: hidden;
+        }
+
+        .glass-panel {
+            background: rgba(15, 23, 42, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+        }
+        
+        .glass-card {
+            background: linear-gradient(145deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.02) 100%);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .glass-card:hover {
+            transform: translateY(-5px);
+            background: linear-gradient(145deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.03) 100%);
+            border-color: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 20px 40px -10px rgba(139, 92, 246, 0.2);
+        }
+
+        .text-gradient {
+            background: linear-gradient(to right, #c4b5fd, #60a5fa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s cubic-bezier(0.5, 0, 0, 1);
+        }
+
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .chart-bar {
+            width: 0;
+            transition: width 1.5s ease-out;
+        }
+        .reveal.active .chart-bar {
+            width: var(--target-width);
+        }
+
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #0f172a; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #475569; }
+
+        .mesh-bg {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh; z-index: -1;
+            background: 
+                radial-gradient(at 0% 0%, hsla(253,16%,7%,1) 0, transparent 50%), 
+                radial-gradient(at 50% 0%, hsla(225,39%,30%,1) 0, transparent 50%), 
+                radial-gradient(at 100% 0%, hsla(339,49%,30%,1) 0, transparent 50%);
+            opacity: 0.4;
+        }
+    </style>
+</head>
+<body class="antialiased min-h-screen flex flex-col">
+
+    <div class="mesh-bg"></div>
+
+    <div id="app">
+        <nav class="fixed w-full z-50 glass-panel border-b border-white/5">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex items-center justify-between h-16">
+                    <div class="flex items-center gap-2">
+                        <a href="#" class="flex items-center gap-2 hover:opacity-80 transition-opacity">
+                            <i data-lucide="sparkles" class="text-brand-primary w-6 h-6"></i>
+                            <span class="font-display font-bold text-xl tracking-tight text-white">Super OpenCode</span>
+                        </a>
+                    </div>
+                    <div class="hidden md:block">
+                        <div class="ml-10 flex items-baseline space-x-6">
+                            <a href="#flaws" class="hover:text-white text-gray-300 px-3 py-2 rounded-md text-sm font-medium transition-colors">底层缺陷</a>
+                            <a href="#solution" class="hover:text-white text-gray-300 px-3 py-2 rounded-md text-sm font-medium transition-colors">核心原理</a>
+                            <a href="#engineering" class="hover:text-white text-gray-300 px-3 py-2 rounded-md text-sm font-medium transition-colors">工程实践</a>
+                            <a href="#defense" class="hover:text-white text-gray-300 px-3 py-2 rounded-md text-sm font-medium transition-colors">防御设计</a>
+                            <a href="#skills" class="hover:text-white text-gray-300 px-3 py-2 rounded-md text-sm font-medium transition-colors">Skills</a>
+                            <a href="#feishu" class="hover:text-white text-gray-300 px-3 py-2 rounded-md text-sm font-medium transition-colors">飞书 Bot</a>
+                            <a href="https://github.com/lengjingxu/oh-my-opencode-releases/releases/download/v1.3.3/Super.OpenCode-1.3.3-arm64.dmg" class="bg-brand-primary/80 hover:bg-brand-primary text-white px-4 py-2 rounded-full text-sm font-medium transition-all border border-brand-primary/50 flex items-center gap-2">
+                                <i data-lucide="download" class="w-4 h-4"></i> 下载
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <section class="relative pt-32 pb-20 lg:pt-40 lg:pb-28 overflow-hidden">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
+                <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full glass-card mb-8 animate-float">
+                    <span class="w-2 h-2 rounded-full bg-green-400 animate-pulse"></span>
+                    <span class="text-sm font-medium text-gray-300">开箱即用 · 国内直连 · 模型已筛选</span>
+                </div>
+                
+                <h1 class="text-4xl md:text-6xl lg:text-7xl font-display font-bold tracking-tight mb-8 leading-tight">
+                    不是更聪明的 AI<br>
+                    而是<span class="text-gradient">更聪明的使用方式</span>
+                </h1>
+                
+                <p class="mt-4 max-w-3xl mx-auto text-lg md:text-xl text-gray-400 leading-relaxed">
+                    一套完整的多 Agent AI 编程方案。我们已经替你筛选好了模型、配置好了国内可直连的 API、<br class="hidden md:block">
+                    整理好了工程化流程和最佳实践。<strong class="text-white">你不需要再去摸索，下载即用。</strong>
+                </p>
+
+                <div class="mt-10 flex flex-wrap justify-center gap-4">
+                    <a href="https://github.com/lengjingxu/oh-my-opencode-releases/releases/download/v1.3.3/Super.OpenCode-1.3.3-arm64.dmg" class="group relative px-8 py-4 bg-brand-primary hover:bg-brand-primary/90 rounded-xl font-semibold text-white transition-all shadow-[0_0_20px_rgba(139,92,246,0.5)] hover:shadow-[0_0_30px_rgba(139,92,246,0.7)] flex items-center gap-2">
+                        <i data-lucide="download" class="w-5 h-5"></i>
+                        下载 Mac 版
+                        <i data-lucide="arrow-right" class="w-5 h-5 group-hover:translate-x-1 transition-transform"></i>
+                    </a>
+                    <a href="#flaws" class="px-8 py-4 glass-card hover:bg-white/10 rounded-xl font-semibold text-white transition-all flex items-center gap-2">
+                        <i data-lucide="book-open" class="w-5 h-5"></i>
+                        了解原理
+                    </a>
+                </div>
+            </div>
+
+            <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 mt-20">
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div class="glass-card p-5 rounded-xl text-center">
+                        <div class="w-10 h-10 mx-auto bg-green-500/20 rounded-lg flex items-center justify-center mb-3 text-green-400">
+                            <i data-lucide="package-check" class="w-5 h-5"></i>
+                        </div>
+                        <div class="font-bold text-white text-sm mb-1">开箱即用</div>
+                        <div class="text-xs text-gray-500">下载配置工具，一键生成完整配置</div>
+                    </div>
+                    <div class="glass-card p-5 rounded-xl text-center">
+                        <div class="w-10 h-10 mx-auto bg-blue-500/20 rounded-lg flex items-center justify-center mb-3 text-blue-400">
+                            <i data-lucide="globe" class="w-5 h-5"></i>
+                        </div>
+                        <div class="font-bold text-white text-sm mb-1">国内直连</div>
+                        <div class="text-xs text-gray-500">已整合国内可用 API，无需翻墙</div>
+                    </div>
+                    <div class="glass-card p-5 rounded-xl text-center">
+                        <div class="w-10 h-10 mx-auto bg-purple-500/20 rounded-lg flex items-center justify-center mb-3 text-purple-400">
+                            <i data-lucide="filter" class="w-5 h-5"></i>
+                        </div>
+                        <div class="font-bold text-white text-sm mb-1">模型已筛选</div>
+                        <div class="text-xs text-gray-500">每个角色匹配最优模型，成本降 60%</div>
+                    </div>
+                    <div class="glass-card p-5 rounded-xl text-center">
+                        <div class="w-10 h-10 mx-auto bg-orange-500/20 rounded-lg flex items-center justify-center mb-3 text-orange-400">
+                            <i data-lucide="route" class="w-5 h-5"></i>
+                        </div>
+                        <div class="font-bold text-white text-sm mb-1">流程已整理</div>
+                        <div class="text-xs text-gray-500">踩坑经验沉淀为规则，避免重复探索</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-brand-primary/20 rounded-full blur-[120px] -z-10"></div>
+        </section>
+
+        <!-- Level 1: Underlying Flaws -->
+        <section id="flaws" class="py-24 relative border-t border-white/5 bg-black/20">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-16 reveal">
+                    <span class="text-red-400 font-semibold tracking-wider uppercase text-sm">The Problem</span>
+                    <h2 class="text-3xl md:text-4xl font-bold font-display mt-2 mb-6">AI 模型的底层缺陷</h2>
+                    <p class="text-gray-400 max-w-2xl mx-auto">即使是 GPT-4 或 Claude 3.5 Opus，也无法逃脱物理定律的束缚。</p>
+                </div>
+
+                <!-- Section 1: Attention Dilution -->
+                <div class="grid md:grid-cols-2 gap-12 items-center mb-24 reveal">
+                    <div>
+                        <div class="flex items-center gap-3 mb-4">
+                            <div class="p-2 bg-red-500/20 rounded-lg text-red-400"><i data-lucide="alert-octagon" class="w-6 h-6"></i></div>
+                            <h3 class="text-2xl font-bold">注意力稀释 (Attention Dilution)</h3>
+                        </div>
+                        <p class="text-gray-400 text-lg leading-relaxed mb-6">
+                            就像人类的工作记忆一样，AI 的注意力机制是有限的。当你试图在一个 Prompt 中塞入 50 条规则时，模型在多轮对话后会不可避免地发生"灾难性遗忘"。
+                        </p>
+                        <div class="glass-card p-4 rounded-lg bg-red-500/5 border-red-500/10">
+                            <div class="flex items-start gap-3">
+                                <i data-lucide="info" class="w-5 h-5 text-red-400 shrink-0 mt-1"></i>
+                                <p class="text-sm text-red-200/80">研究数据表明，当 System Prompt 超过 2000 token 时，末尾指令的遵循率会下降 30% 以上。这就是为什么"全能 Prompt"通常效果不佳。</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="glass-card p-8 rounded-2xl relative">
+                        <h4 class="text-sm font-bold text-gray-400 mb-6 text-center">指令遵循率随对话轮次变化</h4>
+                        <div class="relative h-48 w-full">
+                            <div class="absolute left-0 top-0 bottom-0 w-8 border-r border-white/10 flex flex-col justify-between text-xs text-gray-500 pr-2">
+                                <span>100%</span>
+                                <span>50%</span>
+                                <span>0%</span>
+                            </div>
+                            <div class="absolute left-10 right-0 top-0 bottom-0">
+                                <svg viewBox="0 0 100 50" class="w-full h-full overflow-visible">
+                                    <defs>
+                                        <linearGradient id="chartGradient" x1="0" y1="0" x2="0" y2="1">
+                                            <stop offset="0%" stop-color="#ef4444" stop-opacity="0.2"/>
+                                            <stop offset="100%" stop-color="#ef4444" stop-opacity="0"/>
+                                        </linearGradient>
+                                    </defs>
+                                    <path d="M0,5 Q40,5 100,45" fill="none" stroke="#ef4444" stroke-width="2" vector-effect="non-scaling-stroke" />
+                                    <path d="M0,5 Q40,5 100,45 V50 H0 Z" fill="url(#chartGradient)" />
+                                    <circle cx="0" cy="5" r="2" class="fill-red-500" />
+                                    <circle cx="50" cy="20" r="2" class="fill-red-500" />
+                                    <circle cx="100" cy="45" r="2" class="fill-red-500" />
+                                </svg>
+                            </div>
+                            <div class="absolute -bottom-6 left-10 right-0 flex justify-between text-xs text-gray-500">
+                                <span>Round 1</span>
+                                <span>Round 10</span>
+                                <span>Round 20</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 2: Context Window -->
+                <div class="grid md:grid-cols-2 gap-12 items-center mb-24 reveal md:flex-row-reverse">
+                    <div class="order-2 md:order-1">
+                        <div class="glass-card p-8 rounded-2xl">
+                            <h4 class="text-sm font-bold text-gray-400 mb-6">200K 上下文窗口消耗模拟</h4>
+                            
+                            <div class="space-y-6">
+                                <div>
+                                    <div class="flex justify-between text-xs mb-2">
+                                        <span class="text-blue-400">System Prompt</span>
+                                        <span class="text-gray-500">5k (2.5%)</span>
+                                    </div>
+                                    <div class="h-2 bg-white/5 rounded-full overflow-hidden">
+                                        <div class="h-full bg-blue-500 w-[2.5%]"></div>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <div class="flex justify-between text-xs mb-2">
+                                        <span class="text-green-400">项目代码库 (100 files)</span>
+                                        <span class="text-gray-500">120k (60%)</span>
+                                    </div>
+                                    <div class="h-2 bg-white/5 rounded-full overflow-hidden">
+                                        <div class="h-full bg-green-500 w-[60%]"></div>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <div class="flex justify-between text-xs mb-2">
+                                        <span class="text-yellow-400">对话历史 (15 rounds)</span>
+                                        <span class="text-gray-500">60k (30%)</span>
+                                    </div>
+                                    <div class="h-2 bg-white/5 rounded-full overflow-hidden">
+                                        <div class="h-full bg-yellow-500 w-[30%]"></div>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <div class="flex justify-between text-xs mb-2">
+                                        <span class="text-red-500 font-bold">剩余可用空间</span>
+                                        <span class="text-red-500 font-bold">15k (CRITICAL)</span>
+                                    </div>
+                                    <div class="h-2 bg-white/5 rounded-full overflow-hidden border border-red-500/30">
+                                        <div class="h-full bg-red-500 w-[7.5%] animate-pulse"></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mt-6 p-4 bg-black/40 rounded-xl text-xs text-gray-400 font-mono">
+                                > Context Overflow Detected<br>
+                                > Initiating automated garbage collection...<br>
+                                <span class="text-red-400">> ERROR: Important instructions dropped.</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="order-1 md:order-2">
+                        <div class="flex items-center gap-3 mb-4">
+                            <div class="p-2 bg-blue-500/20 rounded-lg text-blue-400"><i data-lucide="minimize-2" class="w-6 h-6"></i></div>
+                            <h3 class="text-2xl font-bold">上下文窗口硬限制</h3>
+                        </div>
+                        <p class="text-gray-400 text-lg leading-relaxed mb-6">
+                            即使是 200K 的窗口也经不起真实项目的消耗。当代码库被读取，窗口迅速填满。超出部分会被<strong>直接丢弃</strong>，导致 AI "失忆"。
+                        </p>
+                        <ul class="space-y-3">
+                            <li class="flex items-center gap-3 text-gray-300">
+                                <i data-lucide="x-circle" class="text-red-400 w-5 h-5"></i>
+                                <span>任务丢失：忘记要做什么</span>
+                            </li>
+                            <li class="flex items-center gap-3 text-gray-300">
+                                <i data-lucide="x-circle" class="text-red-400 w-5 h-5"></i>
+                                <span>规则丢失：忘记怎么做（代码规范失效）</span>
+                            </li>
+                            <li class="flex items-center gap-3 text-gray-300">
+                                <i data-lucide="x-circle" class="text-red-400 w-5 h-5"></i>
+                                <span>重复工作：忘记已经修改过哪些文件</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Section 3: Model Specialization -->
+                <div class="reveal">
+                    <div class="flex items-center gap-3 mb-8 justify-center">
+                        <div class="p-2 bg-purple-500/20 rounded-lg text-purple-400"><i data-lucide="cpu" class="w-6 h-6"></i></div>
+                        <h3 class="text-2xl font-bold">模型能力的差异化</h3>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <div class="glass-card p-6 rounded-xl border-t-2 border-purple-500">
+                            <div class="font-bold text-lg mb-2">Claude 3.5 Sonnet</div>
+                            <div class="flex flex-wrap gap-2 mb-4">
+                                <span class="px-2 py-0.5 rounded text-xs bg-purple-500/20 text-purple-300">Coding God</span>
+                            </div>
+                            <p class="text-sm text-gray-400">目前最强的编程模型。逻辑严密，代码质量极高，适合核心架构设计。</p>
+                        </div>
+                        <div class="glass-card p-6 rounded-xl border-t-2 border-green-500">
+                            <div class="font-bold text-lg mb-2">Claude Haiku</div>
+                            <div class="flex flex-wrap gap-2 mb-4">
+                                <span class="px-2 py-0.5 rounded text-xs bg-green-500/20 text-green-300">Fast</span>
+                                <span class="px-2 py-0.5 rounded text-xs bg-green-500/20 text-green-300">Cheap</span>
+                            </div>
+                            <p class="text-sm text-gray-400">速度极快，成本极低。适合处理简单的拼写修正、格式化、文档生成。</p>
+                        </div>
+                        <div class="glass-card p-6 rounded-xl border-t-2 border-blue-500">
+                            <div class="font-bold text-lg mb-2">Gemini Pro</div>
+                            <div class="flex flex-wrap gap-2 mb-4">
+                                <span class="px-2 py-0.5 rounded text-xs bg-blue-500/20 text-blue-300">Visual</span>
+                                <span class="px-2 py-0.5 rounded text-xs bg-blue-500/20 text-blue-300">Creative</span>
+                            </div>
+                            <p class="text-sm text-gray-400">由于其多模态特性，在 CSS/UI 设计和视觉理解方面表现出色。</p>
+                        </div>
+                        <div class="glass-card p-6 rounded-xl border-t-2 border-orange-500">
+                            <div class="font-bold text-lg mb-2">GPT-4o</div>
+                            <div class="flex flex-wrap gap-2 mb-4">
+                                <span class="px-2 py-0.5 rounded text-xs bg-orange-500/20 text-orange-300">Logic</span>
+                            </div>
+                            <p class="text-sm text-gray-400">数学和逻辑推理能力强，适合算法优化和复杂的数据结构设计。</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Level 2: Core Solutions -->
+        <section id="solution" class="py-24 relative">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-20 reveal">
+                    <span class="text-brand-primary font-semibold tracking-wider uppercase text-sm">The Solution</span>
+                    <h2 class="text-3xl md:text-4xl font-bold font-display mt-2 mb-6">分而治之：多 Agent 架构</h2>
+                    <p class="text-gray-400 max-w-2xl mx-auto">既然单个 AI 无法承载所有上下文，我们通过架构设计将任务拆解，让每个 Agent 只关注它需要知道的那部分。</p>
+                </div>
+
+                <!-- Section 4: Architecture Diagram -->
+                <div class="reveal mb-32">
+                    <div class="glass-panel p-8 md:p-16 rounded-3xl relative overflow-hidden">
+                        <div class="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:40px_40px] -z-10"></div>
+                        
+                        <div class="flex flex-col items-center relative z-10">
+                            <!-- Master Node -->
+                            <div class="flex flex-col items-center mb-12 relative group">
+                                <div class="w-32 h-32 rounded-full glass-card border-2 border-brand-primary flex flex-col items-center justify-center relative z-10 shadow-[0_0_50px_rgba(139,92,246,0.3)]">
+                                    <i data-lucide="cpu" class="w-10 h-10 text-white mb-2"></i>
+                                    <span class="font-bold text-white">Sisyphus</span>
+                                    <span class="text-xs text-brand-primary mt-1">Master Agent</span>
+                                </div>
+                                <div class="absolute -inset-4 bg-brand-primary/20 rounded-full blur-xl -z-10 group-hover:bg-brand-primary/30 transition-all"></div>
+                                
+                                <div class="absolute top-32 left-1/2 -translate-x-1/2 w-0.5 h-12 bg-gradient-to-b from-brand-primary to-transparent"></div>
+                                <div class="absolute top-[calc(100%+2rem)] left-1/2 -translate-x-1/2 w-[600px] h-0.5 bg-white/10 hidden md:block"></div>
+                            </div>
+
+                            <!-- Sub Agents -->
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-24 w-full">
+                                <div class="flex flex-col items-center relative">
+                                    <div class="h-8 w-0.5 bg-white/10 md:absolute md:-top-10 md:left-1/2"></div>
+                                    <div class="p-6 glass-card rounded-xl border border-blue-500/30 w-full text-center hover:scale-105 transition-transform">
+                                        <div class="w-10 h-10 bg-blue-500/20 rounded-lg flex items-center justify-center mx-auto mb-3 text-blue-400">
+                                            <i data-lucide="palette" class="w-5 h-5"></i>
+                                        </div>
+                                        <h4 class="font-bold mb-1">UI/UX Agent</h4>
+                                        <p class="text-xs text-gray-400 mb-2">Role: Visual</p>
+                                        <div class="px-2 py-1 bg-black/40 rounded text-xs font-mono text-gray-500 text-left">
+                                            > Recv: Design Spec<br>
+                                            > Send: HTML/CSS
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="flex flex-col items-center relative">
+                                    <div class="h-8 w-0.5 bg-white/10 md:absolute md:-top-10 md:left-1/2"></div>
+                                    <div class="p-6 glass-card rounded-xl border border-purple-500/30 w-full text-center hover:scale-105 transition-transform">
+                                        <div class="w-10 h-10 bg-purple-500/20 rounded-lg flex items-center justify-center mx-auto mb-3 text-purple-400">
+                                            <i data-lucide="database" class="w-5 h-5"></i>
+                                        </div>
+                                        <h4 class="font-bold mb-1">Backend Agent</h4>
+                                        <p class="text-xs text-gray-400 mb-2">Role: Logic</p>
+                                        <div class="px-2 py-1 bg-black/40 rounded text-xs font-mono text-gray-500 text-left">
+                                            > Recv: API Schema<br>
+                                            > Send: Python Code
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="flex flex-col items-center relative">
+                                    <div class="h-8 w-0.5 bg-white/10 md:absolute md:-top-10 md:left-1/2"></div>
+                                    <div class="p-6 glass-card rounded-xl border border-green-500/30 w-full text-center hover:scale-105 transition-transform">
+                                        <div class="w-10 h-10 bg-green-500/20 rounded-lg flex items-center justify-center mx-auto mb-3 text-green-400">
+                                            <i data-lucide="search" class="w-5 h-5"></i>
+                                        </div>
+                                        <h4 class="font-bold mb-1">Researcher</h4>
+                                        <p class="text-xs text-gray-400 mb-2">Role: Info</p>
+                                        <div class="px-2 py-1 bg-black/40 rounded text-xs font-mono text-gray-500 text-left">
+                                            > Recv: Query<br>
+                                            > Send: Summary
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mt-12 p-4 rounded-full bg-white/5 border border-white/10 text-sm text-gray-400 flex items-center gap-2">
+                                <i data-lucide="git-merge" class="w-4 h-4"></i>
+                                子代理只返回结果，不返回过程。主代理保持上下文清洁。
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 5: Intelligent Routing -->
+                <div class="grid md:grid-cols-2 gap-16 mb-24 reveal">
+                    <div>
+                        <h3 class="text-2xl font-bold mb-6">智能路由：让对的模型做对的事</h3>
+                        <p class="text-gray-400 leading-relaxed mb-6">
+                            不是所有任务都需要最贵的模型。Super OpenCode 内置了基于任务分类（Category）的智能路由引擎。
+                        </p>
+                        <ul class="space-y-4">
+                            <li class="flex items-center justify-between p-4 glass-card rounded-xl">
+                                <div class="flex items-center gap-3">
+                                    <span class="w-2 h-2 rounded-full bg-green-500"></span>
+                                    <span>Quick Fix</span>
+                                </div>
+                                <div class="flex items-center gap-4">
+                                    <i data-lucide="arrow-right" class="w-4 h-4 text-gray-500"></i>
+                                    <span class="font-mono text-green-400">Claude Haiku</span>
+                                </div>
+                            </li>
+                            <li class="flex items-center justify-between p-4 glass-card rounded-xl">
+                                <div class="flex items-center gap-3">
+                                    <span class="w-2 h-2 rounded-full bg-blue-500"></span>
+                                    <span>Visual Engineering</span>
+                                </div>
+                                <div class="flex items-center gap-4">
+                                    <i data-lucide="arrow-right" class="w-4 h-4 text-gray-500"></i>
+                                    <span class="font-mono text-blue-400">Gemini Pro</span>
+                                </div>
+                            </li>
+                            <li class="flex items-center justify-between p-4 glass-card rounded-xl">
+                                <div class="flex items-center gap-3">
+                                    <span class="w-2 h-2 rounded-full bg-purple-500"></span>
+                                    <span>UltraBrain / Deep</span>
+                                </div>
+                                <div class="flex items-center gap-4">
+                                    <i data-lucide="arrow-right" class="w-4 h-4 text-gray-500"></i>
+                                    <span class="font-mono text-purple-400">GPT-4 / Opus</span>
+                                </div>
+                            </li>
+                        </ul>
+                        <div class="mt-6 flex items-center gap-2 text-green-400 text-sm font-bold">
+                            <i data-lucide="trending-down" class="w-4 h-4"></i>
+                            <span>Token 成本节省 50%+</span>
+                        </div>
+                    </div>
+                    <div class="glass-card p-6 rounded-2xl font-mono text-xs overflow-hidden">
+                        <div class="flex gap-2 mb-4 border-b border-white/10 pb-2">
+                            <div class="w-3 h-3 rounded-full bg-red-500"></div>
+                            <div class="w-3 h-3 rounded-full bg-yellow-500"></div>
+                            <div class="w-3 h-3 rounded-full bg-green-500"></div>
+                        </div>
+                        <div class="space-y-2">
+                            <div class="text-gray-500"># Router Logic</div>
+                            <div><span class="text-purple-400">def</span> <span class="text-blue-400">route_task</span>(category):</div>
+                            <div class="pl-4">
+                                <span class="text-purple-400">if</span> category == <span class="text-green-300">"quick"</span>:
+                            </div>
+                            <div class="pl-8 text-gray-400">return models.HAIKU</div>
+                            <div class="pl-4">
+                                <span class="text-purple-400">elif</span> category == <span class="text-green-300">"visual"</span>:
+                            </div>
+                            <div class="pl-8 text-gray-400">return models.GEMINI_PRO</div>
+                            <div class="pl-4">
+                                <span class="text-purple-400">elif</span> category == <span class="text-green-300">"ultrabrain"</span>:
+                            </div>
+                            <div class="pl-8 text-gray-400">return models.GPT4_TURBO</div>
+                            <div class="pl-4">
+                                <span class="text-purple-400">else</span>:
+                            </div>
+                            <div class="pl-8 text-gray-400">return models.DEFAULT</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 6: Prompt Append -->
+                <div class="reveal">
+                    <h3 class="text-2xl font-bold mb-6 text-center">prompt_append：精准的知识注入</h3>
+                    <p class="text-gray-400 text-center max-w-2xl mx-auto mb-12">
+                        为了避免注意力稀释，我们不把所有规则一次性给 AI。而是根据角色动态追加 (Append) 最相关的知识。
+                    </p>
+                    
+                    <div class="grid md:grid-cols-3 gap-6">
+                        <div class="glass-card p-6 rounded-xl hover:-translate-y-2 transition-transform">
+                            <div class="text-xs text-gray-500 mb-2">Role: Visual Agent</div>
+                            <div class="font-bold text-blue-400 mb-4">+ Design System</div>
+                            <p class="text-xs text-gray-400">注入 Tailwind 颜色变量、Glassmorphism CSS 类名、间距规范、字体配置。</p>
+                        </div>
+                        <div class="glass-card p-6 rounded-xl hover:-translate-y-2 transition-transform">
+                            <div class="text-xs text-gray-500 mb-2">Role: Backend Agent</div>
+                            <div class="font-bold text-green-400 mb-4">+ Database Schema</div>
+                            <p class="text-xs text-gray-400">注入 SQL 表结构、ORM 模型定义、API 接口规范、鉴权中间件逻辑。</p>
+                        </div>
+                        <div class="glass-card p-6 rounded-xl hover:-translate-y-2 transition-transform">
+                            <div class="text-xs text-gray-500 mb-2">Role: Test Agent</div>
+                            <div class="font-bold text-orange-400 mb-4">+ Testing Framework</div>
+                            <p class="text-xs text-gray-400">注入 Pytest 配置、Playwright 选择器策略、Mock 数据生成规则。</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- Level 3: Engineering Practices -->
+        <section id="engineering" class="py-24 relative bg-black/20 border-t border-white/5">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-20 reveal">
+                    <span class="text-brand-secondary font-semibold tracking-wider uppercase text-sm">Best Practices</span>
+                    <h2 class="text-3xl md:text-4xl font-bold font-display mt-2 mb-6">工程化防御机制</h2>
+                    <p class="text-gray-400 max-w-2xl mx-auto">让 AI 在无人值守的情况下也能稳定运行的保障。</p>
+                </div>
+
+                <!-- Section 7: Anti-Amnesia -->
+                <div class="mb-24 reveal">
+                    <h3 class="text-2xl font-bold mb-8 flex items-center gap-2">
+                        <i data-lucide="shield" class="text-brand-primary"></i> 防失忆机制
+                    </h3>
+                    <div class="grid md:grid-cols-2 gap-8">
+                        <div class="glass-card p-8 rounded-2xl">
+                            <h4 class="font-bold text-lg mb-4">TODO Continuation Hook</h4>
+                            <p class="text-gray-400 text-sm mb-6">
+                                每次 AI 回复后，系统会自动检测 `todos` 列表的状态。如果发现有 `pending` 或 `in_progress` 的任务，系统会强制注入一条新的 User 消息：
+                            </p>
+                            <div class="bg-black/40 p-4 rounded-lg text-xs font-mono text-yellow-300 border-l-4 border-yellow-500">
+                                "Checking todos... Found 2 pending tasks. Please continue to the next step immediately."
+                            </div>
+                        </div>
+                        <div class="glass-card p-8 rounded-2xl">
+                            <h4 class="font-bold text-lg mb-4">Ralph Loop</h4>
+                            <p class="text-gray-400 text-sm mb-6">
+                                一个死循环脚本，直到目标达成才停止。它解决了 AI "做完一步就停下来等表扬" 的惰性问题。
+                            </p>
+                            <div class="flex items-center gap-4 text-sm font-mono text-gray-400">
+                                <div class="px-3 py-1 bg-white/5 rounded">Start</div>
+                                <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                                <div class="px-3 py-1 bg-white/5 rounded">Check Status</div>
+                                <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                                <div class="px-3 py-1 bg-brand-primary/20 text-brand-primary rounded border border-brand-primary/30">Action</div>
+                                <i data-lucide="rotate-cw" class="w-4 h-4"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 8: Anti-Boundary -->
+                <div class="mb-24 reveal">
+                    <h3 class="text-2xl font-bold mb-8 flex items-center gap-2">
+                        <i data-lucide="lock" class="text-brand-primary"></i> 防越界机制
+                    </h3>
+                    <div class="glass-card p-8 rounded-2xl">
+                        <div class="grid lg:grid-cols-2 gap-12">
+                            <div>
+                                <h4 class="font-bold text-lg mb-4">7段式委派结构</h4>
+                                <p class="text-gray-400 text-sm leading-relaxed mb-6">
+                                    我们禁止 AI 发送模糊的指令。所有任务委派必须符合严格的 JSON 结构，包含明确的边界约束 (MUST NOT DO)。
+                                </p>
+                                <ul class="space-y-2 text-sm text-gray-400">
+                                    <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-green-400"></i> Task Definition</li>
+                                    <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-green-400"></i> Expected Outcome</li>
+                                    <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-green-400"></i> Skills & Tools</li>
+                                    <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-green-400"></i> Must Do / Must Not Do</li>
+                                </ul>
+                            </div>
+                            <div class="bg-black/40 rounded-xl p-6 font-mono text-xs overflow-x-auto">
+                                <div class="text-gray-500">// Example Constraint</div>
+                                <div class="text-purple-400">"must_not_do"</div>: [
+                                <div class="pl-4 text-green-300">"Ask user for clarification"</div>,
+                                <div class="pl-4 text-green-300">"Leave TODO comments in code"</div>,
+                                <div class="pl-4 text-green-300">"Change unrelated files"</div>
+                                ]
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 9: Cost -->
+                <div class="reveal">
+                     <h3 class="text-2xl font-bold mb-8 flex items-center gap-2">
+                        <i data-lucide="coins" class="text-brand-primary"></i> 成本优化实践
+                    </h3>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="border-b border-white/10 text-gray-400 text-sm">
+                                    <th class="p-4">任务类型</th>
+                                    <th class="p-4">传统模式 (All GPT-4)</th>
+                                    <th class="p-4">Smart Routing</th>
+                                    <th class="p-4">节省</th>
+                                </tr>
+                            </thead>
+                            <tbody class="text-sm divide-y divide-white/5">
+                                <tr class="bg-white/5">
+                                    <td class="p-4 font-medium text-white">文档修正 (10 files)</td>
+                                    <td class="p-4 text-gray-400">$0.60</td>
+                                    <td class="p-4 text-green-400">$0.02 (Haiku)</td>
+                                    <td class="p-4 text-green-400 font-bold">-96%</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-4 font-medium text-white">前端页面开发</td>
+                                    <td class="p-4 text-gray-400">$2.50</td>
+                                    <td class="p-4 text-green-400">$0.50 (Gemini)</td>
+                                    <td class="p-4 text-green-400 font-bold">-80%</td>
+                                </tr>
+                                <tr class="bg-white/5">
+                                    <td class="p-4 font-medium text-white">复杂算法重构</td>
+                                    <td class="p-4 text-gray-400">$3.00</td>
+                                    <td class="p-4 text-purple-400">$3.00 (GPT-4)</td>
+                                    <td class="p-4 text-gray-500">0%</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Defensive Design -->
+        <section id="defense" class="py-24 relative overflow-hidden">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-16 reveal">
+                    <span class="text-green-400 font-semibold tracking-wider uppercase text-sm">Elegant Engineering</span>
+                    <h2 class="text-3xl md:text-4xl font-bold font-display mt-2 mb-6">精巧的防御性设计</h2>
+                    <p class="text-gray-400 max-w-2xl mx-auto">预见问题，自动修复，用户无感知。一套强大的自动纠错系统，确保 AI 在遇到错误时能自我恢复。</p>
+                </div>
+
+                <div class="mb-16">
+                    <h3 class="text-xl font-bold mb-8 flex items-center gap-2 text-green-400 reveal">
+                        <i data-lucide="shield-check" class="w-5 h-5"></i> 错误自动恢复
+                    </h3>
+                    <div class="grid md:grid-cols-3 gap-6">
+                        <div class="glass-card p-6 rounded-xl border-t-4 border-green-500 reveal">
+                            <div class="flex items-center gap-3 mb-4">
+                                <div class="p-2 bg-green-500/20 rounded-lg text-green-400"><i data-lucide="refresh-ccw" class="w-5 h-5"></i></div>
+                                <h4 class="font-bold">上下文超限恢复</h4>
+                            </div>
+                            <div class="space-y-3 text-sm">
+                                <div class="p-3 bg-red-500/10 rounded border border-red-500/20">
+                                    <span class="text-red-400 font-bold block text-xs mb-1">PROBLEM</span>
+                                    <span class="text-gray-400">对话太长导致 API 崩溃</span>
+                                </div>
+                                <div class="p-3 bg-green-500/10 rounded border border-green-500/20">
+                                    <span class="text-green-400 font-bold block text-xs mb-1">SOLUTION</span>
+                                    <span class="text-gray-400">自动触发 compact 压缩上下文</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="glass-card p-6 rounded-xl border-t-4 border-green-500 reveal">
+                            <div class="flex items-center gap-3 mb-4">
+                                <div class="p-2 bg-green-500/20 rounded-lg text-green-400"><i data-lucide="edit-3" class="w-5 h-5"></i></div>
+                                <h4 class="font-bold">编辑错误恢复</h4>
+                            </div>
+                            <div class="space-y-3 text-sm">
+                                <div class="p-3 bg-red-500/10 rounded border border-red-500/20">
+                                    <span class="text-red-400 font-bold block text-xs mb-1">PROBLEM</span>
+                                    <span class="text-gray-400">AI 假设文件内容导致编辑失败</span>
+                                </div>
+                                <div class="p-3 bg-green-500/10 rounded border border-green-500/20">
+                                    <span class="text-green-400 font-bold block text-xs mb-1">SOLUTION</span>
+                                    <span class="text-gray-400">强制 READ → 验证 → 重试</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="glass-card p-6 rounded-xl border-t-4 border-green-500 reveal">
+                            <div class="flex items-center gap-3 mb-4">
+                                <div class="p-2 bg-green-500/20 rounded-lg text-green-400"><i data-lucide="git-pull-request" class="w-5 h-5"></i></div>
+                                <h4 class="font-bold">委派失败重试</h4>
+                            </div>
+                            <div class="space-y-3 text-sm">
+                                <div class="p-3 bg-red-500/10 rounded border border-red-500/20">
+                                    <span class="text-red-400 font-bold block text-xs mb-1">PROBLEM</span>
+                                    <span class="text-gray-400">AI 调用 delegate_task 格式错误</span>
+                                </div>
+                                <div class="p-3 bg-green-500/10 rounded border border-green-500/20">
+                                    <span class="text-green-400 font-bold block text-xs mb-1">SOLUTION</span>
+                                    <span class="text-gray-400">检测 9 种错误，注入正确示例</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid md:grid-cols-2 gap-12 mb-16">
+                    <div>
+                        <h3 class="text-xl font-bold mb-8 flex items-center gap-2 text-orange-400 reveal">
+                            <i data-lucide="lock" class="w-5 h-5"></i> 行为约束系统
+                        </h3>
+                        <div class="space-y-6">
+                            <div class="glass-card p-6 rounded-xl border-l-4 border-orange-500 reveal">
+                                <h4 class="font-bold mb-3">子代理提问拦截</h4>
+                                <p class="text-sm text-gray-400 mb-3">
+                                    <span class="text-red-400">问题：</span>子代理打断用户问问题<br>
+                                    <span class="text-green-400">方案：</span>直接抛错阻止 question 工具调用
+                                </p>
+                                <div class="text-xs bg-white/5 p-2 rounded text-gray-300">效果：子代理必须自主完成或返回父代理汇报</div>
+                            </div>
+                            <div class="glass-card p-6 rounded-xl border-l-4 border-orange-500 reveal">
+                                <h4 class="font-bold mb-3">上下文空间监控</h4>
+                                <p class="text-sm text-gray-400 mb-3">
+                                    <span class="text-red-400">问题：</span>AI 误以为没空间而草率完成<br>
+                                    <span class="text-green-400">方案：</span>70% 时提醒"还有空间，别急"
+                                </p>
+                                <div class="text-xs bg-white/5 p-2 rounded text-gray-300">效果：防止 AI 因恐慌而跳过重要步骤</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-bold mb-8 flex items-center gap-2 text-blue-400 reveal">
+                            <i data-lucide="cpu" class="w-5 h-5"></i> 智能模式切换
+                        </h3>
+                        <div class="space-y-6">
+                            <div class="glass-card p-6 rounded-xl border-l-4 border-blue-500 reveal">
+                                <h4 class="font-bold mb-3">关键词检测器</h4>
+                                <div class="flex gap-2 mb-3">
+                                    <span class="px-2 py-1 bg-blue-500/20 rounded text-xs text-blue-300 font-mono">[analyze-mode]</span>
+                                    <span class="px-2 py-1 bg-blue-500/20 rounded text-xs text-blue-300 font-mono">[ultrawork]</span>
+                                </div>
+                                <div class="text-xs bg-white/5 p-2 rounded text-gray-300">效果：自动注入对应的系统指令和工作模式</div>
+                            </div>
+                            <div class="glass-card p-6 rounded-xl border-l-4 border-blue-500 reveal">
+                                <h4 class="font-bold mb-3">深度思考模式</h4>
+                                <p class="text-sm text-gray-400 mb-3">触发词：用户说 "think"</p>
+                                <div class="text-xs bg-white/5 p-2 rounded text-gray-300">效果：自动切换 high variant + extended thinking</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="glass-panel p-8 rounded-2xl border border-brand-primary/30 bg-brand-primary/5 reveal text-center">
+                    <h3 class="text-xl font-bold mb-6">设计哲学</h3>
+                    <div class="grid md:grid-cols-4 gap-6">
+                        <div class="space-y-2">
+                            <div class="w-10 h-10 mx-auto bg-white/10 rounded-full flex items-center justify-center text-white font-bold">1</div>
+                            <div class="font-bold text-white">用户无感知</div>
+                            <div class="text-xs text-gray-400">错误自动恢复，不打断工作流</div>
+                        </div>
+                        <div class="space-y-2">
+                            <div class="w-10 h-10 mx-auto bg-white/10 rounded-full flex items-center justify-center text-white font-bold">2</div>
+                            <div class="font-bold text-white">强制正确行为</div>
+                            <div class="text-xs text-gray-400">不是建议，而是阻止错误发生</div>
+                        </div>
+                        <div class="space-y-2">
+                            <div class="w-10 h-10 mx-auto bg-white/10 rounded-full flex items-center justify-center text-white font-bold">3</div>
+                            <div class="font-bold text-white">自主完成</div>
+                            <div class="text-xs text-gray-400">子代理不能问问题，必须自己搞定</div>
+                        </div>
+                        <div class="space-y-2">
+                            <div class="w-10 h-10 mx-auto bg-white/10 rounded-full flex items-center justify-center text-white font-bold">4</div>
+                            <div class="font-bold text-white">防御性设计</div>
+                            <div class="text-xs text-gray-400">预设所有可能的错误模式并自动修复</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- UI/UX Design Intelligence -->
+        <section id="uiux" class="py-24 relative overflow-hidden">
+            <div class="absolute top-1/2 right-0 -translate-y-1/2 w-[600px] h-[600px] bg-purple-500/10 rounded-full blur-[100px] -z-10"></div>
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-20 reveal">
+                    <span class="text-purple-400 font-semibold tracking-wider uppercase text-sm">Design Intelligence</span>
+                    <h2 class="text-3xl md:text-4xl font-bold font-display mt-2 mb-6">让 AI 生成专业级 UI，而不是 AI 味十足的界面</h2>
+                    <p class="text-gray-400 max-w-2xl mx-auto">集成 ui-ux-pro-max skill，67 种设计风格、96 种配色方案、57 组字体搭配，自动生成设计系统</p>
+                </div>
+
+                <!-- Three-Layer Trigger -->
+                <div class="mb-24 reveal">
+                    <h3 class="text-2xl font-bold mb-4 text-center">三层触发机制：装上就能用的秘密</h3>
+                    <p class="text-gray-400 text-center mb-12">不是 AI 变聪明了，而是系统预设了完整的触发-路由-分析链路</p>
+                    <div class="space-y-6">
+                        <div class="glass-card p-6 rounded-2xl border-l-4 border-blue-500 hover:bg-blue-500/5 transition-all relative overflow-hidden">
+                            <div class="absolute top-0 right-0 p-4 opacity-10 font-display font-bold text-6xl text-blue-500">01</div>
+                            <div class="grid md:grid-cols-12 gap-6 items-center">
+                                <div class="md:col-span-3">
+                                    <div class="inline-block px-3 py-1 rounded-full bg-blue-500/20 text-blue-400 text-xs font-bold mb-2">Layer 1</div>
+                                    <h4 class="text-xl font-bold text-white">Skill 关键词触发</h4>
+                                </div>
+                                <div class="md:col-span-6 font-mono text-sm text-gray-400 bg-black/20 p-4 rounded-lg border border-white/5">
+                                    <div class="mb-1 text-blue-300">用户输入: "帮我做一个电商后台的登录页面"</div>
+                                    <div class="pl-4 border-l border-blue-500/30 space-y-1">
+                                        <div>├── 动词: "做" → 匹配 create/build/design</div>
+                                        <div>└── 名词: "页面" → 匹配 UI/界面/组件</div>
+                                    </div>
+                                </div>
+                                <div class="md:col-span-3 text-center md:text-right">
+                                    <div class="inline-flex items-center gap-2 text-green-400 font-bold bg-green-500/10 px-4 py-2 rounded-lg border border-green-500/20">
+                                        <i data-lucide="check-circle" class="w-4 h-4"></i> 自动加载 ui-ux-pro-max
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="glass-card p-6 rounded-2xl border-l-4 border-purple-500 hover:bg-purple-500/5 transition-all relative overflow-hidden">
+                            <div class="absolute top-0 right-0 p-4 opacity-10 font-display font-bold text-6xl text-purple-500">02</div>
+                            <div class="grid md:grid-cols-12 gap-6 items-center">
+                                <div class="md:col-span-3">
+                                    <div class="inline-block px-3 py-1 rounded-full bg-purple-500/20 text-purple-400 text-xs font-bold mb-2">Layer 2</div>
+                                    <h4 class="text-xl font-bold text-white">Category 智能路由</h4>
+                                </div>
+                                <div class="md:col-span-6 font-mono text-sm text-gray-400 bg-black/20 p-4 rounded-lg border border-white/5">
+                                    <div class="mb-1 text-purple-300">Sisyphus 分析任务类型:</div>
+                                    <div class="pl-4 border-l border-purple-500/30 space-y-1">
+                                        <div>├── 识别为: UI/前端任务</div>
+                                        <div>└── 路由到: visual-engineering category</div>
+                                    </div>
+                                </div>
+                                <div class="md:col-span-3 text-center md:text-right">
+                                    <div class="inline-flex items-center gap-2 text-green-400 font-bold bg-green-500/10 px-4 py-2 rounded-lg border border-green-500/20">
+                                        <i data-lucide="check-circle" class="w-4 h-4"></i> 注入设计规范提示词
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="glass-card p-6 rounded-2xl border-l-4 border-green-500 hover:bg-green-500/5 transition-all relative overflow-hidden">
+                            <div class="absolute top-0 right-0 p-4 opacity-10 font-display font-bold text-6xl text-green-500">03</div>
+                            <div class="grid md:grid-cols-12 gap-6 items-center">
+                                <div class="md:col-span-3">
+                                    <div class="inline-block px-3 py-1 rounded-full bg-green-500/20 text-green-400 text-xs font-bold mb-2">Layer 3</div>
+                                    <h4 class="text-xl font-bold text-white">Skill 内置分析流程</h4>
+                                </div>
+                                <div class="md:col-span-6 font-mono text-sm text-gray-400 bg-black/20 p-4 rounded-lg border border-white/5">
+                                    <div class="mb-1 text-green-300">ui-ux-pro-max skill 执行:</div>
+                                    <div class="pl-4 border-l border-green-500/30 space-y-1">
+                                        <div>├── 分析产品类型 (→ 电商后台)</div>
+                                        <div>├── 分析目标用户 (→ 运营人员)</div>
+                                        <div>└── 分析使用场景 (→ 工作环境)</div>
+                                    </div>
+                                </div>
+                                <div class="md:col-span-3 text-center md:text-right">
+                                    <div class="inline-flex items-center gap-2 text-green-400 font-bold bg-green-500/10 px-4 py-2 rounded-lg border border-green-500/20">
+                                        <i data-lucide="check-circle" class="w-4 h-4"></i> 匹配最佳设计方案
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid lg:grid-cols-2 gap-16 items-center mb-24">
+                    <div class="reveal">
+                        <h3 class="text-2xl font-bold mb-6 flex items-center gap-3">
+                            <span class="w-10 h-10 rounded-lg bg-red-500/20 flex items-center justify-center text-red-400"><i data-lucide="x-circle" class="w-6 h-6"></i></span>
+                            AI 生成 UI 的通病
+                        </h3>
+                        <div class="glass-card p-8 rounded-2xl border-l-4 border-red-500/50 space-y-4">
+                            <div class="flex items-center gap-3 text-gray-400"><i data-lucide="x" class="w-5 h-5 text-red-400"></i><span>千篇一律的紫粉渐变配色</span></div>
+                            <div class="flex items-center gap-3 text-gray-400"><i data-lucide="x" class="w-5 h-5 text-red-400"></i><span>缺乏交互状态 (No Hover/Focus)</span></div>
+                            <div class="flex items-center gap-3 text-gray-400"><i data-lucide="x" class="w-5 h-5 text-red-400"></i><span>对比度不足，可读性差</span></div>
+                            <div class="flex items-center gap-3 text-gray-400"><i data-lucide="x" class="w-5 h-5 text-red-400"></i><span>使用 Emoji 代替专业 SVG 图标</span></div>
+                            <div class="flex items-center gap-3 text-gray-400"><i data-lucide="x" class="w-5 h-5 text-red-400"></i><span>布局僵硬，缺乏响应式细节</span></div>
+                        </div>
+                    </div>
+                    <div class="reveal">
+                        <h3 class="text-2xl font-bold mb-6 flex items-center gap-3">
+                            <span class="w-10 h-10 rounded-lg bg-green-500/20 flex items-center justify-center text-green-400"><i data-lucide="check-circle" class="w-6 h-6"></i></span>
+                            Super OpenCode 的输出
+                        </h3>
+                        <div class="glass-card p-8 rounded-2xl border-l-4 border-green-500/50 space-y-4">
+                            <div class="flex items-center gap-3 text-gray-300"><i data-lucide="check" class="w-5 h-5 text-green-400"></i><span>基于场景匹配的专业配色方案</span></div>
+                            <div class="flex items-center gap-3 text-gray-300"><i data-lucide="check" class="w-5 h-5 text-green-400"></i><span>完整交互状态 Hover/Focus/Active/Disabled</span></div>
+                            <div class="flex items-center gap-3 text-gray-300"><i data-lucide="check" class="w-5 h-5 text-green-400"></i><span>WCAG 标准对比度 ≥ 4.5:1</span></div>
+                            <div class="flex items-center gap-3 text-gray-300"><i data-lucide="check" class="w-5 h-5 text-green-400"></i><span>Lucide/Heroicons SVG 图标系统</span></div>
+                            <div class="flex items-center gap-3 text-gray-300"><i data-lucide="check" class="w-5 h-5 text-green-400"></i><span>响应式布局 + 触摸目标 ≥ 44px</span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 reveal">
+                    <div class="glass-card p-6 rounded-2xl text-center">
+                        <div class="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400 mb-1">67</div>
+                        <div class="text-sm text-gray-400">设计风格</div>
+                    </div>
+                    <div class="glass-card p-6 rounded-2xl text-center">
+                        <div class="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-400 mb-1">96</div>
+                        <div class="text-sm text-gray-400">配色方案</div>
+                    </div>
+                    <div class="glass-card p-6 rounded-2xl text-center">
+                        <div class="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-emerald-400 mb-1">57</div>
+                        <div class="text-sm text-gray-400">字体搭配</div>
+                    </div>
+                    <div class="glass-card p-6 rounded-2xl text-center">
+                        <div class="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-yellow-400 mb-1">24</div>
+                        <div class="text-sm text-gray-400">布局模式</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="skills" class="py-24 bg-black/30 relative overflow-hidden">
+            <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[600px] bg-brand-primary/10 rounded-full blur-[120px] -z-10"></div>
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-20 reveal">
+                    <span class="text-brand-primary font-semibold tracking-wider uppercase text-sm">Enhanced Capabilities</span>
+                    <h2 class="text-4xl md:text-5xl font-bold font-display mt-2 mb-6">Skills 能力增强</h2>
+                    <p class="text-xl text-gray-300 max-w-2xl mx-auto">给 AI 装上完整的工具箱。10+ 预制技能，覆盖图片生成、数据分析、多平台部署全链路。</p>
+                </div>
+                <div class="space-y-12">
+                    <div class="reveal">
+                        <h3 class="text-2xl font-bold mb-6 flex items-center gap-3 text-purple-400">
+                            <i data-lucide="palette" class="w-6 h-6"></i> 1. 创意生成
+                        </h3>
+                        <div class="glass-card p-8 rounded-2xl border-l-4 border-purple-500">
+                            <div class="flex flex-col md:flex-row gap-8">
+                                <div class="flex-1">
+                                    <div class="flex items-center gap-4 mb-4">
+                                        <div class="p-3 rounded-xl bg-purple-500/20 text-purple-400"><i data-lucide="image" class="w-8 h-8"></i></div>
+                                        <div>
+                                            <h4 class="text-xl font-bold text-white">image-generator</h4>
+                                            <div class="text-sm text-purple-300">AI 图片生成</div>
+                                        </div>
+                                    </div>
+                                    <p class="text-gray-400 mb-4">集成 Stable Diffusion API，自动生成 banner、logo、插图、头像、背景。</p>
+                                    <div class="flex flex-wrap gap-2">
+                                        <span class="px-2 py-1 bg-purple-500/10 text-purple-300 rounded text-xs border border-purple-500/20">生成图片</span>
+                                        <span class="px-2 py-1 bg-purple-500/10 text-purple-300 rounded text-xs border border-purple-500/20">创建banner</span>
+                                        <span class="px-2 py-1 bg-purple-500/10 text-purple-300 rounded text-xs border border-purple-500/20">需要logo</span>
+                                    </div>
+                                </div>
+                                <div class="md:w-1/3 bg-black/30 rounded-xl p-4 border border-white/5">
+                                    <div class="text-xs text-gray-500 mb-2 font-mono">EXAMPLE</div>
+                                    <div class="text-sm text-gray-300 italic">"为登录页生成一个科技感的背景图"</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="reveal">
+                        <h3 class="text-2xl font-bold mb-6 flex items-center gap-3 text-blue-400">
+                            <i data-lucide="database" class="w-6 h-6"></i> 2. 数据能力
+                        </h3>
+                        <div class="grid md:grid-cols-2 gap-6">
+                            <div class="glass-card p-6 rounded-2xl border-l-4 border-blue-500">
+                                <div class="flex items-center gap-4 mb-4">
+                                    <div class="p-3 rounded-xl bg-blue-500/20 text-blue-400"><i data-lucide="search" class="w-6 h-6"></i></div>
+                                    <div><h4 class="text-lg font-bold text-white">sql-query</h4><div class="text-xs text-blue-300">数据库查询</div></div>
+                                </div>
+                                <p class="text-sm text-gray-400 mb-3">支持 MySQL / PostgreSQL，表结构探索、SQL 执行、数据导出。</p>
+                                <div class="text-xs text-gray-500 italic">"查询最近7天的订单数据"</div>
+                            </div>
+                            <div class="glass-card p-6 rounded-2xl border-l-4 border-blue-500">
+                                <div class="flex items-center gap-4 mb-4">
+                                    <div class="p-3 rounded-xl bg-blue-500/20 text-blue-400"><i data-lucide="bar-chart-2" class="w-6 h-6"></i></div>
+                                    <div><h4 class="text-lg font-bold text-white">data-storytelling</h4><div class="text-xs text-blue-300">数据分析可视化</div></div>
+                                </div>
+                                <p class="text-sm text-gray-400 mb-3">数据清洗、统计分析、图表生成，支持 ECharts / Chart.js。</p>
+                                <div class="text-xs text-gray-500 italic">"分析销售数据并生成趋势图"</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="reveal">
+                        <h3 class="text-2xl font-bold mb-6 flex items-center gap-3 text-green-400">
+                            <i data-lucide="rocket" class="w-6 h-6"></i> 3. 自动部署（三种方式）
+                        </h3>
+                        <div class="grid md:grid-cols-3 gap-4">
+                            <div class="glass-card p-5 rounded-xl border-t-4 border-green-500">
+                                <div class="flex justify-between items-start mb-4">
+                                    <div class="p-2 rounded-lg bg-green-500/20 text-green-400"><i data-lucide="cloud-lightning" class="w-6 h-6"></i></div>
+                                    <span class="text-xs font-bold bg-green-500/10 text-green-400 px-2 py-1 rounded">Serverless</span>
+                                </div>
+                                <h4 class="font-bold text-white mb-1">deploy-fc</h4>
+                                <div class="text-xs text-gray-500 mb-3">阿里云函数计算</div>
+                                <p class="text-xs text-gray-400 mb-4">自动打包、上传、发布。按需付费。</p>
+                                <div class="text-xs bg-white/5 p-2 rounded text-gray-300">适用：API 接口、定时任务</div>
+                            </div>
+                            <div class="glass-card p-5 rounded-xl border-t-4 border-green-500">
+                                <div class="flex justify-between items-start mb-4">
+                                    <div class="p-2 rounded-lg bg-green-500/20 text-green-400"><i data-lucide="container" class="w-6 h-6"></i></div>
+                                    <span class="text-xs font-bold bg-green-500/10 text-green-400 px-2 py-1 rounded">Container</span>
+                                </div>
+                                <h4 class="font-bold text-white mb-1">deploy-docker</h4>
+                                <div class="text-xs text-gray-500 mb-3">Docker 容器化</div>
+                                <p class="text-xs text-gray-400 mb-4">自动生成 Dockerfile，构建镜像并部署。</p>
+                                <div class="text-xs bg-white/5 p-2 rounded text-gray-300">适用：微服务、复杂应用</div>
+                            </div>
+                            <div class="glass-card p-5 rounded-xl border-t-4 border-green-500">
+                                <div class="flex justify-between items-start mb-4">
+                                    <div class="p-2 rounded-lg bg-green-500/20 text-green-400"><i data-lucide="server" class="w-6 h-6"></i></div>
+                                    <span class="text-xs font-bold bg-green-500/10 text-green-400 px-2 py-1 rounded">VM</span>
+                                </div>
+                                <h4 class="font-bold text-white mb-1">deploy-ecs</h4>
+                                <div class="text-xs text-gray-500 mb-3">阿里云 ECS</div>
+                                <p class="text-xs text-gray-400 mb-4">SSH 代码上传、PM2 管理、Nginx 配置。</p>
+                                <div class="text-xs bg-white/5 p-2 rounded text-gray-300">适用：传统部署、长期服务</div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <section id="feishu" class="py-24 relative overflow-hidden">
+            <div class="absolute top-1/2 left-0 -translate-y-1/2 w-[600px] h-[600px] bg-blue-500/10 rounded-full blur-[100px] -z-10"></div>
+            <div class="absolute bottom-0 right-0 w-[400px] h-[400px] bg-brand-primary/10 rounded-full blur-[80px] -z-10"></div>
+
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-20 reveal">
+                    <span class="text-blue-400 font-semibold tracking-wider uppercase text-sm">Mobile Command Center</span>
+                    <h2 class="text-4xl md:text-5xl font-bold font-display mt-2 mb-6">
+                        离开电脑，<span class="text-gradient">AI 不停工</span>
+                    </h2>
+                    <p class="text-xl text-gray-300 max-w-2xl mx-auto">
+                        通过飞书 Bot 接入 OpenCode，手机上也能指挥 AI 写代码、查进度、看 Diff。<br>
+                        <strong class="text-white">通勤路上、午餐间隙、甚至躺在床上</strong>，工作从未中断。
+                    </p>
+                </div>
+
+                <!-- Hero Visual: Phone Mockup + Feature Highlights -->
+                <div class="flex flex-col lg:flex-row items-center gap-16 mb-24 reveal">
+                    <!-- Left: Phone Mockup -->
+                    <div class="flex-1 flex justify-center">
+                        <div class="relative">
+                            <div class="w-[300px] glass-panel rounded-[2.5rem] p-3 border-2 border-white/10 shadow-[0_0_60px_rgba(59,130,246,0.2)]">
+                                <div class="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-6 bg-[#0f172a] rounded-b-2xl z-20"></div>
+                                <div class="bg-[#1e293b] rounded-[2rem] overflow-hidden">
+                                    <div class="flex justify-between items-center px-6 pt-8 pb-2 text-xs text-gray-400">
+                                        <span>9:41</span>
+                                        <div class="flex gap-1">
+                                            <i data-lucide="wifi" class="w-3 h-3"></i>
+                                            <i data-lucide="battery-full" class="w-3 h-3"></i>
+                                        </div>
+                                    </div>
+                                    <div class="px-4 py-3 border-b border-white/5 flex items-center gap-3">
+                                        <div class="w-8 h-8 rounded-lg bg-blue-500/20 flex items-center justify-center">
+                                            <i data-lucide="bot" class="w-4 h-4 text-blue-400"></i>
+                                        </div>
+                                        <div>
+                                            <div class="text-sm font-bold text-white">OpenCode Bot</div>
+                                            <div class="text-xs text-green-400">在线</div>
+                                        </div>
+                                    </div>
+                                    <div class="p-4 space-y-3 min-h-[320px]">
+                                        <div class="flex justify-end">
+                                            <div class="bg-blue-500/20 rounded-2xl rounded-tr-sm px-4 py-2 max-w-[200px]">
+                                                <div class="text-sm text-white">帮我重构 auth 模块，加上 JWT 刷新</div>
+                                            </div>
+                                        </div>
+                                        <div class="flex justify-start">
+                                            <div class="bg-white/5 rounded-2xl rounded-tl-sm px-4 py-3 max-w-[220px] border border-white/5">
+                                                <div class="text-xs text-blue-400 font-bold mb-2">AI 正在工作...</div>
+                                                <div class="text-xs text-gray-400 space-y-1">
+                                                    <div class="line-through opacity-60">分析现有 auth 结构</div>
+                                                    <div class="text-blue-300">实现 JWT refresh ← 进行中</div>
+                                                    <div>更新中间件</div>
+                                                    <div>添加测试</div>
+                                                </div>
+                                                <div class="mt-2 text-xs text-gray-500 font-mono">2/4 (50%)</div>
+                                            </div>
+                                        </div>
+                                        <div class="flex gap-2 flex-wrap">
+                                            <span class="px-2 py-1 bg-white/5 rounded-lg text-xs text-gray-400 border border-white/5">/t 任务</span>
+                                            <span class="px-2 py-1 bg-white/5 rounded-lg text-xs text-gray-400 border border-white/5">/d Diff</span>
+                                            <span class="px-2 py-1 bg-red-500/10 rounded-lg text-xs text-red-400 border border-red-500/20">/x 终止</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="absolute inset-0 bg-blue-500/20 blur-[60px] -z-10 scale-75"></div>
+                        </div>
+                    </div>
+
+                    <!-- Right: Key Value Props -->
+                    <div class="flex-1 space-y-8">
+                        <div class="glass-card p-6 rounded-2xl border-l-4 border-blue-500 hover:bg-blue-500/5 transition-all">
+                            <div class="flex items-center gap-4 mb-3">
+                                <div class="p-2 rounded-lg bg-blue-500/20 text-blue-400">
+                                    <i data-lucide="smartphone" class="w-6 h-6"></i>
+                                </div>
+                                <h3 class="text-xl font-bold text-white">手机即指挥中心</h3>
+                            </div>
+                            <p class="text-gray-400">不在电脑前？没关系。打开飞书，发条消息，AI 立刻开始工作。通勤、午餐、散步时都能推进项目。</p>
+                        </div>
+                        <div class="glass-card p-6 rounded-2xl border-l-4 border-purple-500 hover:bg-purple-500/5 transition-all">
+                            <div class="flex items-center gap-4 mb-3">
+                                <div class="p-2 rounded-lg bg-purple-500/20 text-purple-400">
+                                    <i data-lucide="eye" class="w-6 h-6"></i>
+                                </div>
+                                <h3 class="text-xl font-bold text-white">实时进度可视化</h3>
+                            </div>
+                            <p class="text-gray-400">飞书卡片实时更新 Todo 进度条、代码 Diff、Git 状态。AI 在做什么，一目了然。</p>
+                        </div>
+                        <div class="glass-card p-6 rounded-2xl border-l-4 border-green-500 hover:bg-green-500/5 transition-all">
+                            <div class="flex items-center gap-4 mb-3">
+                                <div class="p-2 rounded-lg bg-green-500/20 text-green-400">
+                                    <i data-lucide="wifi-off" class="w-6 h-6"></i>
+                                </div>
+                                <h3 class="text-xl font-bold text-white">零公网依赖</h3>
+                            </div>
+                            <p class="text-gray-400">WebSocket 长连接模式，无需公网 IP、域名或内网穿透。本地电脑运行，飞书直连。</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Feature Grid -->
+                <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-20 reveal">
+                    <div class="glass-card p-6 rounded-2xl text-center group hover:bg-white/5 transition-all">
+                        <div class="w-14 h-14 mx-auto bg-blue-500/20 rounded-xl flex items-center justify-center mb-4 text-blue-400 group-hover:scale-110 transition-transform">
+                            <i data-lucide="message-square" class="w-7 h-7"></i>
+                        </div>
+                        <h4 class="font-bold text-white mb-2">自然语言对话</h4>
+                        <p class="text-sm text-gray-400">直接发消息给 Bot，像跟同事聊天一样指挥 AI 工作</p>
+                    </div>
+                    <div class="glass-card p-6 rounded-2xl text-center group hover:bg-white/5 transition-all">
+                        <div class="w-14 h-14 mx-auto bg-purple-500/20 rounded-xl flex items-center justify-center mb-4 text-purple-400 group-hover:scale-110 transition-transform">
+                            <i data-lucide="layers" class="w-7 h-7"></i>
+                        </div>
+                        <h4 class="font-bold text-white mb-2">多会话管理</h4>
+                        <p class="text-sm text-gray-400">创建、切换、管理多个独立会话，不同项目互不干扰</p>
+                    </div>
+                    <div class="glass-card p-6 rounded-2xl text-center group hover:bg-white/5 transition-all">
+                        <div class="w-14 h-14 mx-auto bg-orange-500/20 rounded-xl flex items-center justify-center mb-4 text-orange-400 group-hover:scale-110 transition-transform">
+                            <i data-lucide="terminal" class="w-7 h-7"></i>
+                        </div>
+                        <h4 class="font-bold text-white mb-2">快捷命令</h4>
+                        <p class="text-sm text-gray-400">/t 看任务 · /d 看 Diff · /v Git 状态 · /x 紧急终止</p>
+                    </div>
+                    <div class="glass-card p-6 rounded-2xl text-center group hover:bg-white/5 transition-all">
+                        <div class="w-14 h-14 mx-auto bg-pink-500/20 rounded-xl flex items-center justify-center mb-4 text-pink-400 group-hover:scale-110 transition-transform">
+                            <i data-lucide="brain" class="w-7 h-7"></i>
+                        </div>
+                        <h4 class="font-bold text-white mb-2">对话记忆</h4>
+                        <p class="text-sm text-gray-400">自动摘要历史会话，关键词索引，跨会话知识传递</p>
+                    </div>
+                </div>
+
+                <div class="reveal">
+                    <h3 class="text-2xl font-bold font-display mb-10 text-center">真实使用场景</h3>
+                    <div class="grid md:grid-cols-3 gap-8">
+                        <div class="glass-card p-8 rounded-2xl relative overflow-hidden group">
+                            <div class="absolute top-0 right-0 p-3 opacity-10 font-display font-bold text-5xl text-blue-500">01</div>
+                            <div class="w-12 h-12 bg-blue-500/20 rounded-xl flex items-center justify-center mb-6 text-blue-400">
+                                <i data-lucide="train-front" class="w-6 h-6"></i>
+                            </div>
+                            <h4 class="text-lg font-bold text-white mb-3">通勤路上</h4>
+                            <p class="text-sm text-gray-400 mb-4">地铁上掏出手机，给 Bot 发一条："把昨天的 PR review 意见都改了，顺便加上单测"。到公司时，代码已经改好了。</p>
+                            <div class="flex items-center gap-2 text-xs text-blue-400">
+                                <i data-lucide="clock" class="w-3 h-3"></i>
+                                <span>节省 30 分钟</span>
+                            </div>
+                        </div>
+                        <div class="glass-card p-8 rounded-2xl relative overflow-hidden group">
+                            <div class="absolute top-0 right-0 p-3 opacity-10 font-display font-bold text-5xl text-purple-500">02</div>
+                            <div class="w-12 h-12 bg-purple-500/20 rounded-xl flex items-center justify-center mb-6 text-purple-400">
+                                <i data-lucide="coffee" class="w-6 h-6"></i>
+                            </div>
+                            <h4 class="text-lg font-bold text-white mb-3">午餐间隙</h4>
+                            <p class="text-sm text-gray-400 mb-4">吃饭时想到一个优化方案，立刻发给 Bot。/t 看进度，/d 看改了哪些文件。吃完饭回去直接 review。</p>
+                            <div class="flex items-center gap-2 text-xs text-purple-400">
+                                <i data-lucide="zap" class="w-3 h-3"></i>
+                                <span>灵感不丢失</span>
+                            </div>
+                        </div>
+                        <div class="glass-card p-8 rounded-2xl relative overflow-hidden group">
+                            <div class="absolute top-0 right-0 p-3 opacity-10 font-display font-bold text-5xl text-green-500">03</div>
+                            <div class="w-12 h-12 bg-green-500/20 rounded-xl flex items-center justify-center mb-6 text-green-400">
+                                <i data-lucide="moon" class="w-6 h-6"></i>
+                            </div>
+                            <h4 class="text-lg font-bold text-white mb-3">下班之后</h4>
+                            <p class="text-sm text-gray-400 mb-4">睡前想起明天要 demo，发条消息让 AI 准备好。第二天早上打开电脑，功能已经实现，测试已经通过。</p>
+                            <div class="flex items-center gap-2 text-xs text-green-400">
+                                <i data-lucide="sparkles" class="w-3 h-3"></i>
+                                <span>AI 替你加班</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-20 glass-panel p-8 md:p-12 rounded-3xl border border-white/10 reveal">
+                    <h3 class="text-xl font-bold mb-8 text-center">技术架构</h3>
+                    <div class="flex flex-col md:flex-row items-center justify-center gap-4 text-sm">
+                        <div class="px-6 py-3 bg-blue-500/10 rounded-lg border border-blue-500/20 text-center">
+                            <div class="font-bold text-blue-400">飞书 App</div>
+                            <div class="text-xs text-gray-500 mt-1">手机 / 桌面</div>
+                        </div>
+                        <div class="flex flex-col items-center gap-1">
+                            <i data-lucide="arrow-right" class="w-5 h-5 text-gray-500 hidden md:block"></i>
+                            <i data-lucide="arrow-down" class="w-5 h-5 text-gray-500 md:hidden"></i>
+                            <span class="text-xs text-gray-500">WebSocket</span>
+                        </div>
+                        <div class="px-6 py-3 bg-purple-500/10 rounded-lg border border-purple-500/20 text-center">
+                            <div class="font-bold text-purple-400">Feishu Bot</div>
+                            <div class="text-xs text-gray-500 mt-1">本地运行</div>
+                        </div>
+                        <div class="flex flex-col items-center gap-1">
+                            <i data-lucide="arrow-right" class="w-5 h-5 text-gray-500 hidden md:block"></i>
+                            <i data-lucide="arrow-down" class="w-5 h-5 text-gray-500 md:hidden"></i>
+                            <span class="text-xs text-gray-500">HTTP + SSE</span>
+                        </div>
+                        <div class="px-6 py-3 bg-green-500/10 rounded-lg border border-green-500/20 text-center">
+                            <div class="font-bold text-green-400">OpenCode Server</div>
+                            <div class="text-xs text-gray-500 mt-1">AI 引擎</div>
+                        </div>
+                        <div class="flex flex-col items-center gap-1">
+                            <i data-lucide="arrow-right" class="w-5 h-5 text-gray-500 hidden md:block"></i>
+                            <i data-lucide="arrow-down" class="w-5 h-5 text-gray-500 md:hidden"></i>
+                            <span class="text-xs text-gray-500">执行</span>
+                        </div>
+                        <div class="px-6 py-3 bg-white/5 rounded-lg border border-white/10 text-center">
+                            <div class="font-bold text-white">你的代码库</div>
+                            <div class="text-xs text-gray-500 mt-1">本地项目</div>
+                        </div>
+                    </div>
+                    <div class="mt-6 text-center text-xs text-gray-500">
+                        全程本地运行，代码不出你的电脑。飞书仅传递文字指令和结果摘要。
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="py-24 relative">
+            <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center reveal">
+                <h2 class="text-4xl font-bold font-display mb-8">从原理到实践的闭环</h2>
+                <p class="text-gray-400 text-lg mb-12">
+                    Super OpenCode 不仅仅是一个 IDE 插件，它是对 AI 编程范式的一次重构。通过承认 AI 的局限性，我们设计出了超越这些局限的系统。
+                </p>
+                <div class="flex flex-wrap justify-center gap-6">
+                    <a href="https://github.com/lengjingxu/oh-my-opencode-releases/releases/download/v1.3.3/Super.OpenCode-1.3.3-arm64.dmg" class="px-8 py-4 bg-brand-primary hover:bg-brand-primary/90 rounded-xl font-semibold text-white transition-all shadow-[0_0_20px_rgba(139,92,246,0.5)] flex items-center gap-2">
+                        <i data-lucide="download" class="w-5 h-5"></i> 立即体验 Super OpenCode
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="border-t border-white/5 py-12 bg-black/40">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center gap-6">
+                <div class="flex items-center gap-2">
+                    <i data-lucide="sparkles" class="text-brand-primary w-5 h-5"></i>
+                    <span class="font-display font-bold text-lg">Super OpenCode</span>
+                </div>
+                <div class="text-sm text-gray-500">
+                    &copy; 2024 Super OpenCode. Built with <span class="text-red-500">♥</span> for developers.
+                </div>
+            </div>
+        </footer>
+
+    </div>
+
+    <script>
+        const { createApp, onMounted } = Vue
+
+        createApp({
+            setup() {
+                onMounted(() => {
+                    lucide.createIcons();
+                    const observer = new IntersectionObserver((entries) => {
+                        entries.forEach(entry => {
+                            if (entry.isIntersecting) {
+                                entry.target.classList.add('active');
+                            }
+                        });
+                    }, { threshold: 0.1 });
+                    document.querySelectorAll('.reveal').forEach((el) => {
+                        observer.observe(el);
+                    });
+                })
+                return {}
+            }
+        }).mount('#app')
+    </script>
+</body>
+</html>

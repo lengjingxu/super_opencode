@@ -1,0 +1,7 @@
+{
+  "name": "vanilla",
+  "display_name": "纯 HTML/CSS/JS",
+  "description": "无框架依赖，原生 HTML + CSS + JavaScript",
+  "category": "frontend",
+  "prompt_append": "## 前端技术栈要求（必须遵守）\n\n### 技术选型\n- 纯 HTML5 + CSS3 + JavaScript (ES6+)\n- 不使用任何前端框架\n- 可使用 CDN 引入的工具库（如 axios、lodash）\n\n### 样式\n- 可使用 Tailwind CSS (CDN)\n- 或使用原生 CSS / CSS 变量\n- 响应式设计：使用媒体查询\n\n### JavaScript\n- 使用 ES6+ 语法\n- 模块化：使用 ES Modules 或 IIFE\n- DOM 操作：原生 API\n\n### 文件结构\n```\nindex.html\ncss/\n  style.css\njs/\n  main.js\n  utils.js\nassets/\n  images/\n```\n\n### 语言\n- 所有注释使用中文\n- 界面文本使用中文"
+}

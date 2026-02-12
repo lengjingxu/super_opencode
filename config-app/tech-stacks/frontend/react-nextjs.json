@@ -1,0 +1,7 @@
+{
+  "name": "react-nextjs",
+  "display_name": "React + Next.js + shadcn/ui",
+  "description": "React 18 + Next.js 14 App Router + shadcn/ui 组件库",
+  "category": "frontend",
+  "prompt_append": "## 前端技术栈要求（必须遵守）\n\n### 框架\n- React 18 + Next.js 14\n- 使用 App Router（不是 Pages Router）\n- 优先使用 Server Components\n- 数据获取使用 Server Actions\n\n### UI 组件\n- 使用 shadcn/ui 组件库\n- 样式使用 Tailwind CSS\n- 图标使用 Lucide React\n\n### 状态管理\n- 简单状态：React useState/useReducer\n- 复杂状态：Zustand\n- 服务端状态：React Query 或 SWR\n\n### 代码规范\n- 使用 TypeScript 严格模式\n- 组件使用函数式写法\n- 文件命名：kebab-case\n- 组件命名：PascalCase\n\n### 语言\n- 所有注释使用中文\n- 界面文本使用中文"
+}

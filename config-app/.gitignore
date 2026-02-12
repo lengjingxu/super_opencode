@@ -1,0 +1,12 @@
+node_modules/
+dist/
+client-dist/
+client/node_modules/
+coverage/
+test-results/
+.env
+*.log
+.DS_Store
+__pycache__/
+*.pyc
+*.pyo

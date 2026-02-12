@@ -1,0 +1,7 @@
+{
+  "name": "java-springboot",
+  "display_name": "Java + Spring Boot",
+  "description": "Spring Boot 3.x + MyBatis-Plus + MySQL",
+  "category": "backend",
+  "prompt_append": "## 后端技术栈要求（必须遵守）\n\n### 框架\n- Spring Boot 3.x\n- Java 17+\n- 构建工具：Maven 或 Gradle\n\n### 数据库\n- ORM：MyBatis-Plus\n- 数据库：MySQL 8.0\n- 连接池：HikariCP\n\n### 项目结构\n```\nsrc/main/java/com/example/\n  Application.java      # 启动类\n  config/               # 配置类\n  controller/           # 控制器\n  service/              # 服务层\n    impl/               # 服务实现\n  mapper/               # MyBatis Mapper\n  entity/               # 实体类\n  dto/                  # 数据传输对象\n  vo/                   # 视图对象\n  common/               # 公共类\n    Result.java         # 统一响应\n    GlobalExceptionHandler.java\n```\n\n### 代码规范\n- 遵循阿里巴巴 Java 开发手册\n- 使用 Lombok 简化代码\n- 统一响应格式：Result<T>\n\n### 日志\n- 使用 SLF4J + Logback\n- 格式：[时间] [级别] [类名] 消息\n- 关键操作必须记录日志\n\n### 语言\n- 所有注释使用中文"
+}

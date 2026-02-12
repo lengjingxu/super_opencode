@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.lengjingxu.feishu-bot</string>
+    
+    <key>ProgramArguments</key>
+    <array>
+        <string>/usr/bin/python3</string>
+        <string>-m</string>
+        <string>feishu_bot.main</string>
+        <string>--opencode-path</string>
+        <string>/Users/leng/.opencode/bin/opencode</string>
+        <string>--working-dir</string>
+        <string>/Users/leng/Desktop/codepro/阿里云函数管理/opencode配置/oh-my-opencode-starter/config-app/feishu_bot</string>
+    </array>
+    
+    <key>WorkingDirectory</key>
+    <string>/Users/leng/Desktop/codepro/阿里云函数管理/opencode配置/oh-my-opencode-starter/config-app</string>
+    
+    <key>EnvironmentVariables</key>
+    <dict>
+        <key>FEISHU_APP_ID</key>
+        <string>YOUR_APP_ID_HERE</string>
+        <key>FEISHU_APP_SECRET</key>
+        <string>YOUR_APP_SECRET_HERE</string>
+    </dict>
+    
+    <key>RunAtLoad</key>
+    <true/>
+    
+    <key>KeepAlive</key>
+    <true/>
+    
+    <key>StandardOutPath</key>
+    <string>/Users/leng/Desktop/codepro/阿里云函数管理/opencode配置/oh-my-opencode-starter/config-app/feishu_bot/bot.log</string>
+    
+    <key>StandardErrorPath</key>
+    <string>/Users/leng/Desktop/codepro/阿里云函数管理/opencode配置/oh-my-opencode-starter/config-app/feishu_bot/bot.error.log</string>
+</dict>
+</plist>

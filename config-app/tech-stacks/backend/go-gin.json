@@ -1,0 +1,7 @@
+{
+  "name": "go-gin",
+  "display_name": "Go + Gin",
+  "description": "Gin Web Framework + GORM + MySQL",
+  "category": "backend",
+  "prompt_append": "## 后端技术栈要求（必须遵守）\n\n### 框架\n- Gin Web Framework\n- Go 1.21+\n- 模块管理：Go Modules\n\n### 数据库\n- ORM：GORM\n- 数据库：MySQL 8.0\n- 迁移：GORM AutoMigrate 或 golang-migrate\n\n### 项目结构\n```\ncmd/\n  main.go             # 应用入口\ninternal/\n  config/             # 配置\n  handler/            # HTTP 处理器\n  service/            # 业务逻辑\n  repository/         # 数据访问层\n  model/              # 数据模型\n  middleware/         # 中间件\npkg/\n  response/           # 统一响应\n  logger/             # 日志\n```\n\n### API 规范\n- RESTful 设计\n- 统一响应格式：{code, message, data}\n- 错误处理：Recovery 中间件\n\n### 日志\n- 使用 zap\n- 结构化日志\n- 关键操作必须记录日志\n\n### 语言\n- 所有注释使用中文"
+}
