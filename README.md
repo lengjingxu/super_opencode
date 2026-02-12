@@ -4,6 +4,36 @@
 
 <!-- ![Super OpenCode 主界面](screenshots/main.png) -->
 
+## 前言：AI 编程的两个根本问题
+
+用 AI 写代码，不管你用 GPT-4、Claude 还是 Gemini，都会撞上两堵墙。这不是模型不够聪明，而是架构层面的物理限制。
+
+### 注意力稀释
+
+AI 的注意力机制和人类的工作记忆一样，是有限的。当你在 System Prompt 里塞了 50 条规则，模型在多轮对话后会不可避免地"灾难性遗忘"——研究表明，System Prompt 超过 2000 token 时，末尾指令的遵循率下降 30% 以上。
+
+这就是为什么你给 AI 定了代码规范，聊了十几轮之后它又开始我行我素。
+
+### 上下文窗口硬限制
+
+即使是 200K 的上下文窗口，也经不起真实项目的消耗：
+
+```
+System Prompt        5K   (2.5%)
+项目代码 (100 files) 120K  (60%)
+对话历史 (15 rounds) 60K   (30%)
+─────────────────────────────────
+剩余可用空间         15K   ← 危险
+```
+
+窗口填满后，超出部分被直接丢弃。AI 开始"失忆"：忘记要做什么、忘记代码规范、重复修改已经改过的文件。
+
+### 解决思路：分而治之
+
+既然单个 AI 承载不了所有上下文，就把任务拆开——让多个 Agent 各司其职，每个只关注自己需要知道的那部分。不同复杂度的任务路由到不同成本的模型。规则不一次性全塞进去，而是按角色动态注入最相关的那部分。
+
+这就是 [OpenCode](https://github.com/opencode-ai/opencode) + [Oh-My-OpenCode](https://github.com/pinkpixel-dev/oh-my-opencode) 的核心方案。而 Super OpenCode 让你不用手动折腾配置，就能用上这套方案。
+
 ## 这是什么？
 
 [OpenCode](https://github.com/opencode-ai/opencode) 是一个强大的终端 AI 编程助手，[Oh-My-OpenCode](https://github.com/pinkpixel-dev/oh-my-opencode) 为它加上了多 Agent 协作、智能路由、防御性设计等能力。
