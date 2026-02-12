@@ -1,0 +1,6 @@
+config-app/client-dist/
+config-app/client/node_modules/
+node_modules/
+.DS_Store
+config-app/client-dist/
+config-app/client/node_modules/
