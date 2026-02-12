@@ -1,93 +1,78 @@
 # Super OpenCode
 
-> 开箱即用的多 Agent AI 编程方案 — 不是更聪明的 AI，而是更聪明的使用方式
+> 基于 [OpenCode](https://github.com/opencode-ai/opencode) + [Oh-My-OpenCode](https://github.com/pinkpixel-dev/oh-my-opencode) 的桌面配置工具，让多 Agent AI 编程开箱即用
 
-<!-- 主界面截图 -->
 <!-- ![Super OpenCode 主界面](screenshots/main.png) -->
 
-## 为什么需要 Super OpenCode？
+## 这是什么？
 
-用 AI 写代码，你大概率遇到过这些问题：
+[OpenCode](https://github.com/opencode-ai/opencode) 是一个强大的终端 AI 编程助手，[Oh-My-OpenCode](https://github.com/pinkpixel-dev/oh-my-opencode) 为它加上了多 Agent 协作、智能路由、防御性设计等能力。
 
-| 痛点 | 原因 | Super OpenCode 怎么解决 |
-|------|------|------------------------|
-| AI 聊几轮就"失忆" | 上下文窗口被代码和对话历史填满，指令被丢弃 | 多 Agent 分治，每个 Agent 只处理自己的上下文 |
-| 所有任务都用最贵的模型 | 没有任务分类机制 | 智能路由：简单任务用 Haiku，复杂任务才用 Opus |
-| 生成的 UI 千篇一律 | AI 缺少设计系统知识 | 内置 67 种设计风格、96 种配色方案的 Skill |
-| 国内网络用不了 | Anthropic/OpenAI 需要代理 | 预配置国内可直连的 API 服务 |
-| 配置太复杂 | 需要手动编辑多个 JSON 文件 | 桌面应用，图形界面一键配置 |
+但要用好这套组合，你需要：手动编辑多个 JSON 配置文件、自己找国内可用的 API 服务、逐个配置模型分配、手动安装和管理 Skills……
 
-## 核心优势
+Super OpenCode 就是解决这个问题的 — 一个桌面应用，把这些繁琐的配置工作变成图形界面的点点选选。
 
-### 🤖 多 Agent 协作，不再失忆
+## Super OpenCode 做了什么？
 
-单个 AI 承载不了所有上下文。Super OpenCode 把任务拆给专职 Agent，每个只关注自己的领域：
+| 我们提供的 | 说明 |
+|-----------|------|
+| **🔧 服务配置** | 国内可直连的 API 代理预配置，支持 OpenRouter、硅基流动等中转服务，一键切换，不用折腾代理 |
+| **🤖 Agent 管理配置** | 为每个 Agent / Category 分配模型，基于技术栈（Vue/React/FastAPI/Spring Boot 等）自动追加提示词 |
+| **📱 飞书 Bot** | 通过飞书对话指挥 AI 写代码，手机上看进度、看 Diff、发指令，离开电脑也能推进项目 |
+| **📦 Skill 整合** | 10+ 预制 Skill 开箱即用，统一管理和配置 |
+
+### 不是我们做的（来自上游项目）
+
+多 Agent 协作架构、智能路由、防御性设计（防失忆/防越界/防崩溃）、任务续接钩子等核心能力，都来自 [OpenCode](https://github.com/opencode-ai/opencode) 和 [Oh-My-OpenCode](https://github.com/pinkpixel-dev/oh-my-opencode)。我们只是让这些能力更容易配置和使用。
+
+## 功能详情
+
+### 🔧 服务配置 — 国内直连，告别代理
+
+OpenCode 内置的 Anthropic、OpenAI 等服务商在国内需要代理，且代理配置存在兼容性问题。
+
+Super OpenCode 预配置了国内可直连的 API 服务，打开应用配好 Key 就能用。
+
+<!-- ![服务配置界面](screenshots/service-config.png) -->
+
+### 🤖 Agent 管理配置 — 按技术栈定制
+
+不只是选模型。选择你的技术栈后，系统会自动为对应的 Agent 追加技术栈相关的提示词：
 
 ```
-                    ┌─────────────┐
-                    │  Sisyphus   │  主编排：分解任务、协调全局
-                    │  (Master)   │
-                    └──────┬──────┘
-              ┌────────────┼────────────┐
-              ▼            ▼            ▼
-        ┌──────────┐ ┌──────────┐ ┌──────────┐
-        │  Oracle  │ │ Explore  │ │ Librarian│
-        │ 架构顾问 │ │ 代码搜索 │ │ 文档检索 │
-        └──────────┘ └──────────┘ └──────────┘
+选择 Vue 3 + Tailwind  →  视觉代理自动注入 Vue 组件规范、Tailwind 类名约定
+选择 Python + FastAPI   →  后端代理自动注入 Pydantic 模型、路由规范
 ```
 
-子 Agent 只返回结果，不返回过程 — 主 Agent 的上下文始终保持清洁。
+支持的技术栈预设：
 
-### 💰 智能路由，Token 成本降 50%+
-
-不是所有任务都需要最贵的模型：
-
-| 任务类型 | 传统方式 (全用 GPT-4) | Super OpenCode | 节省 |
-|---------|----------------------|----------------|------|
-| 文档修正 | $0.60 | $0.02 (Haiku) | -96% |
-| 前端页面 | $2.50 | $0.50 (Gemini) | -80% |
-| 复杂重构 | $3.00 | $3.00 (Opus) | 0% |
-
-### 🛡️ 防御性设计，AI 不再跑偏
-
-- **防失忆**：任务续接钩子自动检测未完成的 todo，强制 AI 继续
-- **防越界**：7 段式委派结构，子 Agent 有明确的 MUST DO / MUST NOT DO
-- **防崩溃**：上下文超限自动压缩，编辑失败自动重试
-
-### 🎨 专业级 UI 输出
-
-内置 `ui-ux-pro-max` Skill，告别 AI 生成的"紫粉渐变"审美：
-
-- 67 种设计风格 · 96 种配色方案 · 57 组字体搭配
-- 完整交互状态 (Hover/Focus/Active/Disabled)
-- WCAG 对比度标准 · Lucide/Heroicons 图标系统
-
-<!-- UI 对比截图 -->
-<!-- ![UI 输出对比](screenshots/ui-comparison.png) -->
-
-### 🌐 国内开箱即用
-
-- 预配置国内可直连的 API 代理服务
-- 支持 OpenRouter、硅基流动等中转
-- 一键配置，无需折腾代理
-
-## 功能一览
-
-<!-- 配置界面截图 -->
-<!-- ![配置管理界面](screenshots/config.png) -->
-
-| 功能 | 说明 |
+| 前端 | 后端 |
 |------|------|
-| **安装向导** | 自动安装 OpenCode + Oh-My-OpenCode，选择技术栈，配置 API Key |
-| **模型配置** | 为不同 Agent / Category 分配最合适的模型 |
-| **Skill 管理** | 启用/配置 10+ 内置 Skill |
-| **自动更新** | 基于 GitHub Releases 的热更新 |
+| Vue 3 + Tailwind + DaisyUI | Python + FastAPI |
+| React + Next.js + shadcn/ui | Java + Spring Boot |
+| Angular | Node.js + Express |
+| 纯 HTML/CSS/JS | Go + Gin |
 
-### 内置 Skills
+<!-- ![Agent 配置界面](screenshots/agent-config.png) -->
+
+### 📱 飞书 Bot — 离开电脑，AI 不停工
+
+通过飞书 Bot 接入 OpenCode，手机上也能指挥 AI 写代码：
+
+<!-- ![飞书 Bot](screenshots/feishu-bot.png) -->
+
+- 自然语言对话，像跟同事聊天一样指挥 AI
+- 实时进度可视化（Todo 进度条、Diff、Git 状态）
+- 快捷命令：`/t` 看任务 · `/d` 看 Diff · `/x` 紧急终止
+- 零公网依赖，WebSocket 长连接，全程本地运行
+
+### 📦 Skill 整合 — 给 AI 装上工具箱
+
+预制 Skill 统一打包，开箱即用：
 
 | Skill | 能力 |
 |-------|------|
-| `ui-ux-pro-max` | 专业 UI/UX 设计智能 |
+| `ui-ux-pro-max` | 67 种设计风格、96 种配色方案、57 组字体搭配 |
 | `deploy-fc` / `deploy-ecs` / `deploy-docker` | 阿里云函数计算 / ECS / Docker 一键部署 |
 | `sql-query` | 数据库连接、查询、数据分析 |
 | `image-generator` | Stable Diffusion API 图片生成 |
@@ -95,18 +80,6 @@
 | `notification` | 飞书 / 企业微信 / 钉钉通知推送 |
 | `git-master` | Git 操作规范 |
 | `log-standard` | 前后端日志规范 |
-
-### 📱 飞书 Bot — 离开电脑，AI 不停工
-
-通过飞书 Bot 接入 OpenCode，手机上也能指挥 AI 写代码：
-
-<!-- 飞书 Bot 截图 -->
-<!-- ![飞书 Bot](screenshots/feishu-bot.png) -->
-
-- 自然语言对话，像跟同事聊天一样指挥 AI
-- 实时进度可视化（Todo 进度条、Diff、Git 状态）
-- 快捷命令：`/t` 看任务 · `/d` 看 Diff · `/x` 紧急终止
-- 零公网依赖，WebSocket 长连接，本地运行
 
 ## 快速开始
 
@@ -158,10 +131,10 @@ npm run build:mac
 
 ## 致谢
 
-基于以下开源项目构建：
+本项目是 OpenCode + Oh-My-OpenCode 的配置工具和能力整合，核心 AI 编程能力来自：
 
-- [OpenCode](https://github.com/opencode-ai/opencode) — AI 编程助手核心
-- [Oh-My-OpenCode](https://github.com/pinkpixel-dev/oh-my-opencode) — 多代理协作框架
+- [OpenCode](https://github.com/opencode-ai/opencode) — 终端 AI 编程助手
+- [Oh-My-OpenCode](https://github.com/pinkpixel-dev/oh-my-opencode) — 多 Agent 协作框架
 
 ## License
 
