@@ -200,12 +200,22 @@
                 </p>
                 
                 <div class="mt-10 flex justify-center gap-4">
-                    <a href="https://github.com/lengjingxu/super_opencode/releases/download/v1.1.1/Super.OpenCode-1.1.1-arm64.dmg" class="group relative px-8 py-4 bg-brand-primary hover:bg-brand-primary/90 rounded-xl font-semibold text-white transition-all shadow-[0_0_20px_rgba(139,92,246,0.5)] hover:shadow-[0_0_30px_rgba(139,92,246,0.7)] flex items-center gap-2">
-                        <i data-lucide="download" class="w-5 h-5"></i>
-                        下载 Mac 版
-                        <i data-lucide="arrow-right" class="w-5 h-5 group-hover:translate-x-1 transition-transform"></i>
-                    </a>
-                    <a href="#methodology" class="px-8 py-4 glass-card hover:bg-white/10 rounded-xl font-semibold text-white transition-all flex items-center gap-2">
+                    <div class="flex flex-col items-center gap-3">
+                        <a :href="downloadUrl" class="group relative px-8 py-4 bg-brand-primary hover:bg-brand-primary/90 rounded-xl font-semibold text-white transition-all shadow-[0_0_20px_rgba(139,92,246,0.5)] hover:shadow-[0_0_30px_rgba(139,92,246,0.7)] flex items-center gap-2">
+                            <i data-lucide="download" class="w-5 h-5"></i>
+                            下载 Mac 版
+                            <i data-lucide="arrow-right" class="w-5 h-5 group-hover:translate-x-1 transition-transform"></i>
+                        </a>
+                        <div class="flex items-center gap-1 p-1 rounded-lg bg-white/5 border border-white/10">
+                            <button v-for="arch in archOptions" :key="arch.key"
+                                @click="selectedArch = arch.key"
+                                :class="selectedArch === arch.key ? 'bg-brand-primary/30 text-white border-brand-primary/50' : 'text-gray-400 hover:text-gray-200 border-transparent'"
+                                class="px-3 py-1 rounded-md text-xs font-medium transition-all border cursor-pointer">
+                                {{ arch.label }}
+                            </button>
+                        </div>
+                    </div>
+                    <a href="#methodology" class="px-8 py-4 glass-card hover:bg-white/10 rounded-xl font-semibold text-white transition-all flex items-center gap-2 self-start">
                         <i data-lucide="book-open" class="w-5 h-5"></i>
                         探索方法论
                     </a>
@@ -1875,10 +1885,22 @@
     </div>
 
     <script>
-        const { createApp, ref, onMounted } = Vue
+        const { createApp, ref, computed, onMounted } = Vue
 
         createApp({
             setup() {
+                const selectedArch = ref('universal')
+                const archOptions = [
+                    { key: 'universal', label: '通用版 (推荐)' },
+                    { key: 'arm64', label: 'Apple Silicon' },
+                    { key: 'x64', label: 'Intel' }
+                ]
+                const downloadUrl = computed(() => {
+                    const base = 'https://github.com/lengjingxu/super_opencode/releases/download/v1.3.3/'
+                    const files = { universal: 'Super.OpenCode-1.3.3-universal.dmg', arm64: 'Super.OpenCode-1.3.3-arm64.dmg', x64: 'Super.OpenCode-1.3.3-x64.dmg' }
+                    return base + files[selectedArch.value]
+                })
+
                 onMounted(() => {
                     // Initialize Lucide Icons
                     lucide.createIcons();
@@ -1897,7 +1919,7 @@
                     });
                 })
 
-                return {}
+                return { selectedArch, archOptions, downloadUrl }
             }
         }).mount('#app')
     </script>
