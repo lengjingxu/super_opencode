@@ -155,13 +155,12 @@ function register() {
       if (!fs.existsSync(backupPath)) {
         return { success: false, error: 'Backup not found' };
       }
-      const configType = backupName.split('-')[0];
       let targetPath;
-      if (configType === 'opencode') {
-        targetPath = path.join(CONFIG_DIR, 'opencode.json');
-      } else if (configType === 'oh') {
+      if (backupName.startsWith('oh-my-opencode-')) {
         targetPath = path.join(CONFIG_DIR, 'oh-my-opencode.json');
-      } else if (configType === 'auth') {
+      } else if (backupName.startsWith('opencode-')) {
+        targetPath = path.join(CONFIG_DIR, 'opencode.json');
+      } else if (backupName.startsWith('auth-')) {
         targetPath = path.join(AUTH_DIR, 'auth.json');
       } else {
         return { success: false, error: 'Unknown backup type' };
