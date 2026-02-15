@@ -132,15 +132,19 @@ function stopOpencodeServer() {
 
 function createClientWindow() {
   if (getClientWindow()) { getClientWindow().focus(); return; }
-  const { port, password } = getServerState();
+  const { port, password, cwd } = getServerState();
   if (!port || !password) { console.error('[client-window] Server not running'); return; }
 
+  const encodedDir = cwd ? encodeURIComponent(cwd) : '';
   const clientSession = session.fromPartition('persist:opencode-client');
   clientSession.webRequest.onBeforeSendHeaders(
     { urls: [`http://127.0.0.1:${port}/*`] },
     (details, callback) => {
       const auth = Buffer.from(`opencode:${password}`).toString('base64');
       details.requestHeaders['Authorization'] = `Basic ${auth}`;
+      if (encodedDir) {
+        details.requestHeaders['x-opencode-directory'] = encodedDir;
+      }
       callback({ requestHeaders: details.requestHeaders });
     }
   );
@@ -150,7 +154,10 @@ function createClientWindow() {
     webPreferences: { session: clientSession, contextIsolation: true, nodeIntegration: false },
     titleBarStyle: 'hiddenInset', backgroundColor: '#131010'
   });
-  win.loadURL(`http://127.0.0.1:${port}`);
+  const url = encodedDir
+    ? `http://127.0.0.1:${port}?directory=${encodedDir}`
+    : `http://127.0.0.1:${port}`;
+  win.loadURL(url);
   win.on('closed', () => { setClientWindow(null); stopOpencodeServer(); });
   setClientWindow(win);
 }
@@ -183,12 +190,6 @@ function register() {
   });
 
   ipcMain.handle('open-client-window', async () => {
-    const cw = getClientWindow();
-    if (cw) {
-      cw.focus();
-      return { success: true, dir: getServerState().cwd };
-    }
-
     const mw = getMainWindow();
     const result = await dialog.showOpenDialog(mw, {
       properties: ['openDirectory'],
@@ -200,15 +201,29 @@ function register() {
     }
 
     const cwd = result.filePaths[0];
-    const { process: proc } = getServerState();
-    if (!proc) {
+    const { process: proc, cwd: currentCwd } = getServerState();
+
+    // server 已在运行但目录不同，需要重启
+    if (proc && currentCwd !== cwd) {
+      const cw = getClientWindow();
+      if (cw && !cw.isDestroyed()) {
+        cw.removeAllListeners('closed');
+        cw.close();
+        setClientWindow(null);
+      }
+      stopOpencodeServer();
+    }
+
+    if (!getServerState().process) {
       const startResult = await startOpencodeServer(cwd, DEFAULT_SERVER_PORT);
       if (!startResult.success) {
         return { success: false, error: startResult.error };
       }
     }
 
-    createClientWindow();
+    const cw = getClientWindow();
+    if (cw) { cw.focus(); }
+    else { createClientWindow(); }
     return { success: true, dir: cwd };
   });
 
@@ -217,18 +232,38 @@ function register() {
       return { success: false, error: 'No directory provided' };
     }
 
-    const cw = getClientWindow();
-    if (cw) {
-      cw.focus();
-      return { success: true };
-    }
+    const { process: proc, cwd: currentCwd } = getServerState();
 
-    const { process: proc } = getServerState();
-    if (!proc) {
+    // 如果 server 已在运行但目录不同，需要重启
+    if (proc && currentCwd !== dir) {
+      const cw = getClientWindow();
+      if (cw && !cw.isDestroyed()) {
+        cw.removeAllListeners('closed');
+        cw.close();
+        setClientWindow(null);
+      }
+      stopOpencodeServer();
+
       const startResult = await startOpencodeServer(dir, DEFAULT_SERVER_PORT);
       if (!startResult.success) {
         return { success: false, error: startResult.error };
       }
+      createClientWindow();
+      return { success: true };
+    }
+
+    // server 已在运行且目录相同，直接 focus
+    if (proc) {
+      const cw = getClientWindow();
+      if (cw) { cw.focus(); }
+      else { createClientWindow(); }
+      return { success: true };
+    }
+
+    // server 未运行，启动新 server
+    const startResult = await startOpencodeServer(dir, DEFAULT_SERVER_PORT);
+    if (!startResult.success) {
+      return { success: false, error: startResult.error };
     }
 
     createClientWindow();

@@ -1,6 +1,6 @@
 {
   "name": "super-opencode",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "description": "Super OpenCode 配置管理中心",
   "main": "main.js",
   "scripts": {
