@@ -324,25 +324,46 @@ function removeHostedServiceConfig(opencodeConfig, ohMyConfig) {
     delete opencodeConfig.provider.hosted;
   }
 
-  if (opencodeConfig.agent?.compaction?.model?.providerID === 'hosted') {
-    delete opencodeConfig.agent.compaction;
-    if (opencodeConfig.agent && Object.keys(opencodeConfig.agent).length === 0) {
-      delete opencodeConfig.agent;
+  const compactionModel = opencodeConfig.agent?.compaction?.model;
+  if (compactionModel) {
+    const isHosted = typeof compactionModel === 'string' 
+      ? compactionModel.startsWith('hosted/') 
+      : (compactionModel && compactionModel.providerID === 'hosted');
+    
+    if (isHosted) {
+      delete opencodeConfig.agent.compaction;
+      if (opencodeConfig.agent && Object.keys(opencodeConfig.agent).length === 0) {
+        delete opencodeConfig.agent;
+      }
     }
   }
 
   if (ohMyConfig.agents) {
     for (const agent of Object.keys(ohMyConfig.agents)) {
-      if (ohMyConfig.agents[agent]?.model?.startsWith('hosted/')) {
-        delete ohMyConfig.agents[agent].model;
+      const model = ohMyConfig.agents[agent]?.model;
+      if (model) {
+        const isHosted = typeof model === 'string' 
+          ? model.startsWith('hosted/') 
+          : (model && model.providerID === 'hosted');
+        
+        if (isHosted) {
+          delete ohMyConfig.agents[agent].model;
+        }
       }
     }
   }
 
   if (ohMyConfig.categories) {
     for (const category of Object.keys(ohMyConfig.categories)) {
-      if (ohMyConfig.categories[category]?.model?.startsWith('hosted/')) {
-        delete ohMyConfig.categories[category].model;
+      const model = ohMyConfig.categories[category]?.model;
+      if (model) {
+        const isHosted = typeof model === 'string' 
+          ? model.startsWith('hosted/') 
+          : (model && model.providerID === 'hosted');
+        
+        if (isHosted) {
+          delete ohMyConfig.categories[category].model;
+        }
       }
     }
   }

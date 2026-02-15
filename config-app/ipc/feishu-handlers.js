@@ -42,8 +42,7 @@ function register() {
 
       const botPaths = [
         path.join(CONFIG_DIR, 'feishu_bot'),
-        path.join(getAppDir(), 'feishu_bot'),
-        path.join(os.homedir(), 'Desktop', 'codepro', '阿里云函数管理', 'opencode配置', 'feishu_bot')
+        path.join(getAppDir(), 'feishu_bot')
       ];
 
       let feishuBotDir = null;
