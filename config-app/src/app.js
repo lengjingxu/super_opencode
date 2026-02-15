@@ -97,7 +97,7 @@
                 webhookSecret: '',
                 notifyDeploy: false,
                 notifyError: false,
-                dbType: 'postgres',
+                dbType: 'mysql',
                 dbHost: 'localhost',
                 dbPort: '5432',
                 dbUsername: '',
@@ -480,7 +480,6 @@
 
         window.copyCommand = () => {
             const cmd = el('install-cmd').innerText;
-            window.api.copyToClipboard(cmd); // Assuming this API exists or use navigator
             if (navigator.clipboard) navigator.clipboard.writeText(cmd);
             showToast('命令已复制');
         };
@@ -503,12 +502,7 @@
             }
             
             if (index === 0) {
-                // Load image service data when switching to appearance tab
-                const urlInput = document.getElementById('image-service-url');
-                const keyInput = document.getElementById('image-service-key');
-                if (urlInput) urlInput.value = state.imageService.url || '';
-                if (keyInput) keyInput.value = state.imageService.apiKey || '';
-                checkImageSkillStatus();
+                // Tab 0: Appearance - no image service loading here
             }
 
             if (index === 2) {
@@ -538,11 +532,6 @@
             if (index === 11) loadUserCenter();
             if (index === 12) loadFeishuConfig();
             if (index === 13) loadLauncherSessions();
-        };
-
-        window.toggleNavGroup = (header) => {
-            const group = header.parentElement;
-            group.classList.toggle('collapsed');
         };
 
         window.toggleNavGroup = (header) => {
